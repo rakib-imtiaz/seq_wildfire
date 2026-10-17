@@ -1,0 +1,94 @@
+.apps {
+  background: var(--ash-1);
+  border-top: 1px solid var(--line);
+}
+
+.apps__grid {
+  display: grid;
+  gap: var(--s-7);
+}
+
+.apps__head {
+  display: grid;
+  gap: var(--s-5);
+  align-content: start;
+}
+
+.apps__hint .hint-touch {
+  display: none;
+}
+
+@media (hover: none) {
+  .apps__hint .hint-fine {
+    display: none;
+  }
+  .apps__hint .hint-touch {
+    display: inline;
+  }
+}
+
+.apps__tiles {
+  display: grid;
+  gap: var(--s-7);
+}
+
+.app {
+  display: grid;
+  gap: var(--s-4);
+  align-content: start;
+}
+
+.app .tpair {
+  --ratio: 4 / 3;
+}
+
+.app__cap {
+  display: grid;
+  gap: 6px;
+}
+
+.app__title {
+  font-weight: 700;
+}
+
+.app__text {
+  color: var(--bone-2);
+  max-width: 40ch;
+}
+
+@media (min-width: 600px) {
+  .apps__tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    row-gap: var(--s-8);
+  }
+  .app .tpair {
+    --ratio: 4 / 5;
+  }
+  /* stagger: the right column sits lower */
+  .app:nth-child(2n) {
+    transform: translateY(var(--s-9));
+  }
+  html[data-motion="on"].js .app[data-reveal]:nth-child(2n):not([data-in]) {
+    transform: translateY(calc(var(--s-9) + 16px));
+  }
+  .apps__tiles {
+    padding-bottom: var(--s-9);
+  }
+}
+
+@media (min-width: 1100px) {
+  .apps__grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    align-items: start;
+  }
+  .apps__head {
+    grid-column: 1 / span 4;
+    position: sticky;
+    top: calc(var(--header-h) + var(--s-7));
+  }
+  .apps__tiles {
+    grid-column: 6 / span 7;
+  }
+}

@@ -1,0 +1,219 @@
+.svcs {
+  background: var(--ash-1);
+  border-top: 1px solid var(--line);
+}
+
+.svcs__head {
+  display: grid;
+  gap: var(--s-5);
+}
+
+.svcs__list {
+  margin-top: var(--s-8);
+  border-top: 1px solid var(--line-2);
+}
+
+.svc {
+  display: grid;
+  gap: var(--s-6);
+  padding-block: var(--s-7);
+  border-bottom: 1px solid var(--line);
+}
+
+.svc__copy {
+  display: grid;
+  align-content: start;
+  gap: var(--s-4);
+}
+
+.svc__n {
+  color: var(--bone);
+  font-size: 0.8125rem;
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+
+.svc__n::after {
+  content: "";
+  width: 32px;
+  height: 1px;
+  background: var(--line-3);
+}
+
+.svc__title {
+  font-size: clamp(1.75rem, 1.2rem + 1.9vw, 2.75rem);
+  font-weight: 700;
+  max-width: 16ch;
+}
+
+.svc__more {
+  color: var(--bone-3);
+}
+
+.svc__vis {
+  min-width: 0;
+}
+
+/* row 2: visible/thermal pair */
+.svc-pair {
+  display: grid;
+  gap: var(--s-3);
+  max-width: 560px;
+}
+
+/* row 3: map still */
+.svc-map {
+  display: grid;
+  gap: var(--s-3);
+}
+
+.svc-map__foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--s-2) var(--s-4);
+}
+
+/* row 4: live feed UI over the photo */
+.feed__ui {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: clamp(10px, 2vw, 18px);
+  color: var(--bone);
+  z-index: 1;
+}
+
+.feed__top,
+.feed__bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+}
+
+.feed__live {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  background: rgba(15, 14, 13, 0.7);
+}
+
+.feed__reticle {
+  width: clamp(64px, 14%, 120px);
+  height: auto;
+  aspect-ratio: 1;
+  place-self: center;
+  opacity: 0.8;
+}
+
+.feed__bottom > span {
+  padding: 3px 8px;
+  background: rgba(15, 14, 13, 0.7);
+}
+
+.feed__modes {
+  display: inline-flex;
+  gap: 10px;
+  color: var(--smoke);
+}
+
+.feed__modes b {
+  font-weight: 500;
+  color: var(--bone);
+}
+
+@media (max-width: 479px) {
+  .feed__modes {
+    display: none !important;
+  }
+}
+
+/* row 5: report card */
+.svc-report {
+  max-width: 560px;
+  background: var(--ash-0);
+  border: 1px solid var(--line-2);
+  padding: var(--s-5);
+  display: grid;
+  gap: var(--s-4);
+}
+
+.svc-report__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--s-3);
+  color: var(--smoke);
+}
+
+.svc-report__thumbs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-3);
+}
+
+.svc-report__thumb {
+  display: grid;
+  gap: 6px;
+  color: var(--smoke);
+}
+
+.svc-report__thumb .scene {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+@media (min-width: 1024px) {
+  .svcs__head {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+  }
+  .svcs__head > * {
+    grid-column: 1 / span 8;
+  }
+  .svc {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    align-items: start;
+    padding-block: var(--s-7);
+  }
+  /* copy starts level with the top of its visual and rides along while the visual scrolls past, so a row never
+     shows a text-less band beside a tall visual */
+  .svc__copy {
+    grid-column: 1 / span 5;
+    grid-row: 1;
+    position: sticky;
+    top: calc(72px + var(--s-6));
+    padding-top: var(--s-2);
+  }
+  .svc__vis {
+    grid-column: 7 / span 6;
+    grid-row: 1;
+  }
+  .svc[data-flip] .svc__copy {
+    grid-column: 8 / span 5;
+  }
+  .svc[data-flip] .svc__vis {
+    grid-column: 1 / span 6;
+  }
+  .svc-pair {
+    max-width: none;
+  }
+  /* the report card keeps its reading width and sits against the copy column, not floating mid-column */
+  .svc-report {
+    width: 100%;
+    max-width: 640px;
+  }
+  .svc:not([data-flip]) .svc-report {
+    margin-right: auto;
+  }
+  .svc[data-flip] .svc-report {
+    margin-left: auto;
+  }
+}

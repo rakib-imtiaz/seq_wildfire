@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Command Table review harness</title>
+  <meta name="robots" content="noindex">
+  <style>html,body{margin:0;background:#050505;color:#999;font:12px monospace} iframe{border:0;display:block}</style>
+</head>
+<body>
+  <!-- Review only: loads table.html at an exact size in a same-origin iframe.
+       ?w=1280&h=720&src=table.html%3Fframe%3D0%26q%3Dbalanced
+       From the console: await review.load('table.html?frame=0.2', 1280, 720); await review.shot('name.png') -->
+  <iframe id="f" title="Command table under review"></iframe>
+  <script>
+    const qs = new URLSearchParams(location.search);
+    const f = document.getElementById('f');
+    window.review = {
+      load(src, w, h) {
+        f.style.width = w + 'px'; f.style.height = h + 'px';
+        return new Promise((res) => {
+          f.onload = () => {
+            const t0 = performance.now();
+            const poll = () => { const t = f.contentWindow.__table; if (t) res({ ok: true, ms: Math.round(performance.now() - t0), stats: t.stats() }); else if (performance.now() - t0 > 60000) res({ ok: false }); else setTimeout(poll, 100); };
+            poll();
+          };
+          f.src = src;
+        });
+      },
+      get table() { return f.contentWindow.__table; },
+      shot(name, type, q) { return f.contentWindow.__table.shot(name, type, q); },
+      unload() { f.src = 'about:blank'; },
+      /**
+       * Load the site at w × h and check the hero and the five steps: live 3D, lens readout, the 3D's labels inside
+       * the view, under no header, not overlapping each other or the caption card; no horizontal scroll; errors.
+       */
+      async site(w, h, path = '/?motion=0') {
+        f.style.width = w + 'px'; f.style.height = h + 'px';
+        const errs = [];
+        await new Promise((res) => { f.onload = res; f.src = path + (path.includes('?') ? '&' : '?') + 'v=' + Date.now(); });
+        const win = f.contentWindow, d = f.contentDocument;
+        win.addEventListener('error', (e) => errs.push(String(e.message)));
+        const oe = win.console.error; win.console.error = (...a) => { errs.push(a.join(' ')); oe(...a); };
+        const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+        for (let i = 0; i < 80 && !d.querySelector('.hero__stage[data-live]'); i++) await wait(250);
+        await wait(400);
+        const header = d.querySelector('header')?.getBoundingClientRect().bottom || 0;
+        const out = { w, h, header: Math.round(header), hscroll: d.documentElement.scrollWidth > win.innerWidth + 1, hero: {}, steps: [] };
+        const st = d.querySelector('.hero__stage');
+        out.hero = { live: st?.hasAttribute('data-live'), readout: d.querySelector('.lens__read')?.textContent.replace(/\s+/g, ' ').trim() };
+        const track = d.querySelector('.steps__track'), stage = d.querySelector('.steps__stage');
+        for (let k = 1; k <= 5; k++) {
+          const r = track.getBoundingClientRect(), stickyTop = parseFloat(win.getComputedStyle(stage).top) || 0;
+          const total = Math.max(1, r.height - stage.offsetHeight);
+          win.scrollTo(0, r.top + win.scrollY - stickyTop + ((k - 0.5) / 5) * total);
+          for (let i = 0; i < 40 && !d.querySelector('.steps__view[data-live]'); i++) await wait(250);
+          await wait(350);
+          const view = d.querySelector('.steps__view').getBoundingClientRect();
+          const card = d.querySelector('.steps__card')?.getBoundingClientRect();
+          const skip = d.querySelector('.steps__skip')?.getBoundingClientRect();
+          const tags = [...d.querySelectorAll('.ct-tag, .ct-report, .ct-token, .ct-legend')].filter((e) => e.style.opacity !== '0' && e.style.display !== 'none' && Number(win.getComputedStyle(e).opacity) > 0.5).map((e) => ({ t: (e.className.split(' ')[0]) + ':' + e.textContent.slice(0, 24), r: e.getBoundingClientRect() }));
+          const issues = [];
+          const phone = win.innerWidth < 1000;
+          for (const a of tags) {
+            if (a.r.left < view.left - 1 || a.r.right > view.right + 1 || a.r.bottom > view.bottom + 1) issues.push('outside view: ' + a.t);
+            if (a.r.top < header - 1) issues.push('under header: ' + a.t);
+            if (phone && card && a.r.bottom > card.top + 1 && a.r.top < card.bottom && !a.t.startsWith('ct-report')) issues.push('over card: ' + a.t);
+            if (phone && skip && a.r.bottom > skip.top + 1 && a.r.top < skip.bottom && a.r.right > skip.left && a.r.left < skip.right) issues.push('over skip: ' + a.t);
+            for (const b of tags) if (a !== b && a.t < b.t && a.r.left < b.r.right && a.r.right > b.r.left && a.r.top < b.r.bottom && a.r.bottom > b.r.top && !(a.t.startsWith('ct-token') && b.t.startsWith('ct-token'))) issues.push('overlap: ' + a.t + ' / ' + b.t);
+          }
+          out.steps.push({ k, step: stage.dataset.step, live: d.querySelector('.steps__view').hasAttribute('data-live'), tags: tags.map((t) => t.t), issues });
+        }
+        out.errs = errs;
+        return out;
+      },
+      /**
+       * The hero at w × h with the site's insets ({ top, avoid, lens }), lens parked at rest: saves a still
+       * (when name is given) and reports the hotspot, the rest point and the share of the lens over no land.
+       */
+      async heroShot(w, h, name, ins, q = 'balanced') {
+        await this.load('table.html?step=0&debug=1&still=1&q=' + q + '&v=' + Date.now(), w, h);
+        await new Promise((r) => setTimeout(r, 300));
+        const T = this.table, t0 = performance.now();
+        if (ins) T.setInsets(ins); else T.resize();
+        const ms = Math.round(performance.now() - t0);
+        const hp = T.getHotspot(), lr = (ins && ins.lens) || 60, rs = hp.rest || hp;
+        T.setLens({ x: rs.x, y: rs.y, r: lr / w, active: !(ins && ins.noLens) });
+        const th = T.thermal, G = th.grid, GW = th.gridW, GH = th.gridH, sx = GW / w;
+        let n = 0, v = 0;
+        if (G) for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) { const px = (x + 0.5) / sx, py = h - (y + 0.5) / sx; if ((px - rs.x * w) ** 2 + (py - rs.y * h) ** 2 > lr * lr) continue; n++; if (!(G[y * GW + x] > -900)) v++; }
+        const s = name ? await this.shot(name) : '';
+        return `${w}x${h} ${ms}ms hotspot ${hp.x.toFixed(2)},${hp.y.toFixed(2)} lens void ${Math.round((100 * v) / Math.max(1, n))}% ${s}`;
+      },
+      /** The site's hero at w × h (motion on unless the path says otherwise): lens position and readout once live. */
+      async heroLive(w, h, path = '/', settle = 2500) {
+        f.style.width = w + 'px'; f.style.height = h + 'px';
+        await new Promise((res) => { f.onload = res; f.src = path + (path.includes('?') ? '&' : '?') + 'v=' + Date.now(); });
+        const d = f.contentDocument, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+        for (let i = 0; i < 80 && !d.querySelector('.hero__stage[data-live]'); i++) await wait(250);
+        await wait(settle);
+        const st = d.querySelector('.hero__stage'), cs = st.style;
+        return { w, h, live: st.hasAttribute('data-live'), lens: [cs.getPropertyValue('--lx'), cs.getPropertyValue('--ly'), cs.getPropertyValue('--lr')], read: d.querySelector('.lens__read')?.textContent.replace(/\s+/g, ' ').trim() };
+      },
+      /** Mean sRGB (0..255) of 7×7 patches of the canvas at CSS points [[x, y], ...], and the frame mean. */
+      px(pts) {
+        const cv = f.contentWindow.__table.canvas, W = cv.width, H = cv.height, k = W / f.clientWidth;
+        const c = document.createElement('canvas'); c.width = W; c.height = H;
+        const g = c.getContext('2d'); g.drawImage(cv, 0, 0);
+        const patch = (x, y, r) => { const d = g.getImageData(Math.max(0, x - r), Math.max(0, y - r), 2 * r + 1, 2 * r + 1).data; const s = [0, 0, 0]; for (let i = 0; i < d.length; i += 4) { s[0] += d[i]; s[1] += d[i + 1]; s[2] += d[i + 2]; } return s.map((v) => Math.round(v / (d.length / 4))); };
+        const out = pts.map(([x, y]) => patch(Math.round(x * k), Math.round(y * k), 3).join(','));
+        const all = g.getImageData(0, 0, W, H).data; let m = 0; for (let i = 0; i < all.length; i += 16) m += (all[i] + all[i + 1] + all[i + 2]) / 3;
+        out.push('mean ' + Math.round(m / (all.length / 16)));
+        return out;
+      },
+    };
+    if (qs.get('src')) window.review.load(qs.get('src'), Number(qs.get('w')) || 1280, Number(qs.get('h')) || 720);
+  </script>
+</body>
+</html>

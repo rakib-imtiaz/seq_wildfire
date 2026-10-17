@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M3T sandbox</title>
+<script type="importmap">
+{ "imports": { "three": "/table/vendor/three/build/three.module.min.js", "three/addons/": "/table/vendor/three/examples/jsm/" } }
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  /* mirrors src/styles/pilot.css (.m3t) and tokens.css so the slot looks as it does on the site */
+  :root { --ash-0: #0f0e0d; --ash-1: #171615; --bone: #ece7e0; --line: rgba(236, 231, 224, 0.12); --line-3: rgba(236, 231, 224, 0.4); }
+  html, body { margin: 0; background: var(--ash-0); color: var(--bone); font: 12px/1.4 "JetBrains Mono", ui-monospace, monospace; }
+  .page { padding: 16px; }
+  .m3t { position: relative; aspect-ratio: 16 / 10; background: radial-gradient(70% 70% at 50% 50%, #1b1a18 0%, var(--ash-1) 80%); box-shadow: 0 0 0 1px var(--line); overflow: hidden; }
+  .m3t .corners { position: absolute; inset: 10px; pointer-events: none; }
+  .m3t .corners i { position: absolute; width: 14px; height: 14px; border: 0 solid var(--line-3); }
+  .m3t .corners i:nth-child(1) { left: 0; top: 0; border-left-width: 1px; border-top-width: 1px; }
+  .m3t .corners i:nth-child(2) { right: 0; top: 0; border-right-width: 1px; border-top-width: 1px; }
+  .m3t .corners i:nth-child(3) { right: 0; bottom: 0; border-right-width: 1px; border-bottom-width: 1px; }
+  .m3t .corners i:nth-child(4) { left: 0; bottom: 0; border-left-width: 1px; border-bottom-width: 1px; }
+  @media (max-width: 599px) { .m3t { aspect-ratio: 1 / 1; } }   /* as pilot.css: square on phones */
+  body.bare .page { padding: 0; }
+  body.bare .info { display: none; }
+  body.light .m3t { background: #d9d6d1; }
+  body.white .m3t { background: #ffffff; }
+  .info { margin-top: 10px; color: rgba(236, 231, 224, 0.7); white-space: pre-wrap; }
+  .grid { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; padding: 16px; }
+  .cell { display: grid; gap: 4px; }
+  .cell iframe { border: 0; display: block; transform-origin: 0 0; }
+  .cell .cap { color: rgba(236, 231, 224, 0.6); }
+</style>
+</head>
+<body>
+<div class="page" id="page">
+  <div class="m3t" id="slot"><div class="corners"><i></i><i></i><i></i><i></i></div></div>
+  <div class="info" id="info"></div>
+</div>
+<script type="module">
+// Flags:
+//   ?view=front|back|left|right|top|bottom|34|folded   review cameras (34 = the site's hero camera, static)
+//   ?fold=0..1  ?pitch=deg  ?yaw=deg  ?prop=deg (rotor angle)  ?blur=0..1
+//   ?detail=table      the light model
+//   ?motion=0          the site's static final pose
+//   ?frame=<s>         deterministic still at timeline time s (hidden tabs throttle rAF)
+//   ?labels=0          no labels      ?wire=1 wireframe     ?sil=1 flat silhouette     ?bg=light|white
+//   ?q=lite|balanced|high   quality tier
+//   ?focus=<node name>  frame one part (gimbal, gimbal_pitch, motor_FL, arm_RL, battery, body, ...)
+//   ?grid=360,390,...  same-origin iframes of this page at those slot widths (other flags pass through);
+//                      ?z=0.5 scales the iframes down for one screenshot
+//   ?bare=1            slot only, full width (used by the grid)
+import { mountM3T } from './js/m3t.js';
+const P = new URLSearchParams(location.search);
+const num = (k) => (P.has(k) ? Number(P.get(k)) : undefined);
+if (P.get('bg')) document.body.classList.add(P.get('bg'));
+
+if (P.has('grid')) {
+  const widths = P.get('grid').split(',').map(Number).filter(Boolean);
+  const z = num('z') || 1;
+  const q = new URLSearchParams(P); q.delete('grid'); q.delete('z'); q.set('bare', '1');
+  const page = document.getElementById('page');
+  page.innerHTML = '';
+  page.className = 'grid';
+  for (const w of widths) {
+    const h = w < 600 ? w : Math.round(w / 1.6);   // the slot is square below 600 px (pilot.css)
+    const cell = document.createElement('div'); cell.className = 'cell';
+    cell.style.width = `${Math.ceil(w * z)}px`; cell.style.height = `${Math.ceil(h * z) + 18}px`;
+    const cap = document.createElement('div'); cap.className = 'cap'; cap.textContent = `${w} × ${h}`;
+    const f = document.createElement('iframe');
+    f.src = `m3t.html?${q}`; f.width = w; f.height = h; f.style.transform = `scale(${z})`;
+    f.style.width = `${w}px`; f.style.height = `${h}px`;
+    cell.append(cap, f); page.appendChild(cell);
+  }
+} else {
+  if (P.get('bare') === '1') document.body.classList.add('bare');
+  const dev = {
+    view: P.get('view') || undefined, fold: num('fold'), pitch: num('pitch'), yaw: num('yaw'), prop: num('prop'), blur: num('blur'),
+    detail: P.get('detail') || undefined, frame: num('frame'), labels: P.get('labels') === '0' ? false : undefined,
+    wire: P.get('wire') === '1', sil: P.get('sil') === '1', q: P.get('q') || undefined, preserve: true, focus: P.get('focus') || undefined,
+  };
+  const t0 = performance.now();
+  const h = mountM3T(document.getElementById('slot'), {
+    motion: P.get('motion') !== '0',
+    onReady: () => { window.__m3tReady = performance.now() - t0; },
+    dev,
+  });
+  window.__m3t = h;
+  const info = document.getElementById('info');
+  const show = () => {
+    const s = h.stats(), mm = (a) => a.map((v) => (v * 1000).toFixed(1)).join(' × ');
+    info.textContent = `ready ${Math.round(window.__m3tReady || 0)} ms · ${s.detail} · ${s.triangles.toLocaleString()} tris · tier ${s.tier} · dpr ${s.dpr} · draws ${s.draws} · slot ${s.size.join('×')} · labels ${s.labels.mode} ${s.labels.compact ? 'short' : 'full'} ${s.labels.side} ${s.labels.order.join('/')} · leader crossings ${s.labels.crossings}\n`
+      + `unfolded ${mm(s.dims.unfolded)} mm (x span · height · length; DJI 347.5 × 107.7 × 283)\n`
+      + `folded   ${mm(s.dims.folded)} mm (x width · height · length; DJI 96.3 × 90.3 × 221)`;
+  };
+  if (P.get('bare') !== '1') setTimeout(show, 50);
+}
+</script>
+</body>
+</html>

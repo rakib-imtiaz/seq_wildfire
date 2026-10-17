@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Shell review</title>
+<style>
+  body { margin: 0; background: #444; font: 12px/1.3 monospace; color: #ddd; }
+  .row { display: flex; gap: 12px; padding: 10px; align-items: flex-start; flex-wrap: wrap; }
+  .cell p { margin: 0 0 4px; }
+  iframe { border: 0; background: #000; display: block; }
+</style>
+</head>
+<body>
+<div class="row" id="row"></div>
+<script>
+  // ?w=360,390,430&h=900&path=/%3Fmotion=0&z=0.5&y=0   (y = scrollY applied inside each frame after load)
+  const q = new URLSearchParams(location.search);
+  const widths = (q.get('w') || '390').split(',').map(Number);
+  const h = Number(q.get('h') || 900);
+  const z = Number(q.get('z') || 0.5);
+  const path = q.get('path') || '/?motion=0';
+  const y = q.get('y');
+  const sel = q.get('sel');
+  const row = document.getElementById('row');
+  // ?ys=0,900,1800 : one frame per scroll position, at the first width
+  const ys = q.get('ys') ? q.get('ys').split(',') : null;
+  const jobs = ys ? ys.map((v) => [widths[0], v]) : widths.map((w) => [w, y]);
+  for (const [w, yy] of jobs) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.innerHTML = `<p>${w}×${h}${yy ? ' y=' + yy : ''}</p>`;
+    const f = document.createElement('iframe');
+    f.width = w; f.height = h; f.src = path;
+    f.style.zoom = z;
+    f.addEventListener('load', () => {
+      const go = () => {
+        try {
+          const d = f.contentDocument;
+          if (sel) { const el = d.querySelector(sel); if (el) f.contentWindow.scrollTo(0, el.getBoundingClientRect().top + f.contentWindow.scrollY - Number(q.get('off') || 0)); }
+          else if (yy) f.contentWindow.scrollTo(0, Number(yy));
+          d.querySelectorAll('[data-reveal]').forEach((e) => e.classList.add('is-in'));
+        } catch (e) { console.log('[review]', e); }
+      };
+      setTimeout(go, 400); setTimeout(go, 1500);
+    });
+    cell.appendChild(f);
+    row.appendChild(cell);
+  }
+</script>
+</body>
+</html>

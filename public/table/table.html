@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Command Table (sandbox) | Sequoia Security Wildfire</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0f0e0d">
+  <script type="importmap">
+    { "imports": {
+      "three": "./vendor/three/build/three.module.min.js",
+      "three/addons/": "./vendor/three/examples/jsm/"
+    } }
+  </script>
+  <style>
+    :root { color-scheme: dark; --ash: #0f0e0d; --ash2: #171615; --smoke: #8c8781; --bone: #ece7e0; --ember: #ff6a1f; }
+    html, body { margin: 0; height: 100%; background: var(--ash); color: var(--bone); overflow: hidden; }
+    body { font: 12px/1.4 ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace; }
+    #stage { position: fixed; inset: 0; }
+    .lensring { position: fixed; border: 1px solid rgba(236, 231, 224, 0.9); border-radius: 50%; pointer-events: none; z-index: 3; display: none; }
+    .hud { position: fixed; left: 12px; bottom: 12px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; z-index: 4; }
+    .hud button { font: inherit; color: var(--bone); background: rgba(23,22,21,.82); border: 1px solid #2c2a28; padding: 8px 11px; min-width: 44px; min-height: 36px; cursor: pointer; letter-spacing: .04em; }
+    .hud button[aria-pressed="true"] { border-color: var(--ember); color: #fff; }
+    .hud input[type=range] { width: min(46vw, 360px); accent-color: var(--ember); }
+    .hud .meta { color: var(--smoke); padding: 0 6px; }
+    .fallback { position: fixed; inset: 0; display: grid; place-items: center; color: var(--smoke); }
+    .fallback[hidden] { display: none; }
+    body.is-still .hud { display: none; }
+  </style>
+</head>
+<body>
+  <div id="stage"></div>
+  <span class="lensring" id="ring" aria-hidden="true"></span>
+  <p class="fallback" id="fallback" hidden>3D view unavailable on this device.</p>
+  <div class="hud" id="hud" hidden>
+    <span class="meta" id="meta">…</span>
+    <button type="button" data-step="1">S1</button><button type="button" data-step="2">S2</button><button type="button" data-step="3">S3</button>
+    <button type="button" data-step="4">S4</button><button type="button" data-step="5">S5</button>
+    <input type="range" id="scrub" min="0" max="1000" value="100" aria-label="Progress through the five steps">
+  </div>
+  <script type="module">
+    // Review flags:
+    //   ?step=0 (the hero) | 1..5 (the centre of that step)   ?frame=0..1 (steps progress, synchronous still)
+    //   ?mode=hero   ?lens=x,y[,r] (hero lens, 0..1; default on the hotspot)   ?q=lite|balanced|high
+    //   ?still=1 (no clock)   ?dpr=2   ?debug=1 (window.__table; shot(name) → /__still dev endpoint, review/table/)
+    import { mountTable } from './js/table.js';
+    const qs = new URLSearchParams(location.search);
+    const frame = qs.has('frame') ? Math.min(1, Math.max(0, Number(qs.get('frame')) || 0)) : null;
+    const step = qs.has('step') ? Number(qs.get('step')) : null;
+    const hero = qs.get('mode') === 'hero' || step === 0;
+    const debug = qs.get('debug') === '1';
+    const still = frame !== null || qs.get('still') === '1';
+    const dpr = Number(qs.get('dpr')) || 0;
+    if (still) document.body.classList.add('is-still');
+    const stage = document.getElementById('stage');
+    const t0 = performance.now();
+    const table = mountTable(stage, {
+      mode: hero ? 'hero' : 'steps', still, debug, dpr,
+      onReady: (r) => {
+        if (!r.ok) { document.getElementById('fallback').hidden = false; return; }
+        document.getElementById('meta').textContent = `${r.quality.tier} · built ${r.buildMs} ms`;
+      },
+      onStep: (n) => document.querySelectorAll('[data-step]').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.step) === n))),
+    });
+    // hero: park the lens on the hotspot (or ?lens=x,y,r) and draw a ring like the site's
+    const placeLens = () => {
+      if (!hero) return null;
+      const hp = table.getHotspot();
+      const L = qs.get('lens') ? qs.get('lens').split(',').map(Number) : [];
+      const x = L.length > 1 ? L[0] : hp ? hp.x : 0.7, y = L.length > 1 ? L[1] : hp ? hp.y : 0.45;
+      const r = L[2] || (innerWidth >= 1024 ? Math.min(150, Math.max(84, innerWidth * 0.066)) : Math.min(104, Math.max(58, innerWidth * 0.15))) / innerWidth;
+      const ring = document.getElementById('ring');
+      Object.assign(ring.style, { display: 'block', left: (x * innerWidth - r * innerWidth) + 'px', top: (y * innerHeight - r * innerWidth) + 'px', width: 2 * r * innerWidth + 'px', height: 2 * r * innerWidth + 'px' });
+      return table.setLens({ x, y, r, active: true });
+    };
+    if (hero) { window.__readout = placeLens(); addEventListener('resize', placeLens); }
+    else if (frame !== null) table.renderFrame(frame);
+    else if (step !== null) table.setStep(step, { instant: true });
+    const bootMs = Math.round(performance.now() - t0);
+    if (!still && !hero) {
+      const hud = document.getElementById('hud'); hud.hidden = false;
+      hud.addEventListener('click', (e) => { const b = e.target.closest('[data-step]'); if (b) { const n = Number(b.dataset.step); table.setProgress((n - 0.5) / 5); document.getElementById('scrub').value = (n - 0.5) * 200; } });
+      document.getElementById('scrub').addEventListener('input', (e) => table.setProgress(e.target.value / 1000));
+    }
+    if (debug || still) {
+      window.__table = Object.assign(table, {
+        bootMs, placeLens,
+        async shot(name = 'shot.png', type = 'image/png', quality = 0.92, dir = 'review') {
+          const dataUrl = table.canvas.toDataURL(type, quality);
+          const r = await fetch('/__still', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, dataUrl, dir }) });
+          return r.text();
+        },
+      });
+    }
+  </script>
+</body>
+</html>

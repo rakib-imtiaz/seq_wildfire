@@ -1,0 +1,382 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  background: var(--ash-0);
+  scroll-padding-top: var(--header-h);
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--ash-0);
+  color: var(--bone);
+  font-family: var(--f-body);
+  font-size: var(--t-body);
+  line-height: 1.6;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+  -webkit-tap-highlight-color: transparent;
+}
+
+img,
+svg,
+canvas,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+ul,
+ol,
+figure,
+dl,
+dd,
+fieldset {
+  margin: 0;
+}
+
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+
+fieldset {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+::selection {
+  background: var(--ember);
+  color: var(--ash-0);
+}
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--bone);
+  outline-offset: 3px;
+}
+
+/* fine grain over everything, fixed so it never repaints with scroll */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- layout ---------- */
+
+.wrap {
+  width: 100%;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section {
+  position: relative;
+  padding-block: var(--section-y);
+}
+
+.section--ash1 {
+  background: var(--ash-1);
+}
+
+.vh {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip {
+  position: fixed;
+  left: var(--s-4);
+  top: var(--s-3);
+  z-index: 200;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding: 0 var(--s-4);
+  background: var(--bone);
+  color: var(--ash-0);
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transform: translateY(-160%);
+  transition: transform var(--d-2) var(--ease);
+}
+
+.skip:focus-visible {
+  transform: none;
+}
+
+/* ---------- type ---------- */
+
+.display {
+  font-family: var(--f-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.004em;
+  line-height: 0.92;
+}
+
+.h2 {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: var(--t-h2);
+  line-height: 0.94;
+  text-transform: uppercase;
+  letter-spacing: 0.002em;
+  text-wrap: balance;
+}
+
+.h3 {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: var(--t-h3);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+.lead {
+  font-size: var(--t-lead);
+  line-height: 1.55;
+  color: var(--bone-2);
+  max-width: 60ch;
+  text-wrap: pretty;
+}
+
+.body {
+  color: var(--bone-2);
+  max-width: 62ch;
+  text-wrap: pretty;
+}
+
+.mono {
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.5;
+}
+
+.mono--s {
+  font-size: var(--t-mono-s);
+}
+
+.smoke {
+  color: var(--smoke);
+}
+
+.dim {
+  color: var(--bone-3);
+}
+
+/* ---------- section label ---------- */
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  color: var(--smoke);
+}
+
+.label__idx {
+  color: var(--bone);
+}
+
+.label__rule {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 1px;
+  background: var(--line-3);
+}
+
+/* ---------- buttons ---------- */
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-3);
+  min-height: var(--tap);
+  padding: 0 var(--s-5);
+  border: 1px solid transparent;
+  border-radius: 0;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1.0625rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  transition:
+    background-color var(--d-2) var(--ease),
+    color var(--d-2) var(--ease),
+    border-color var(--d-2) var(--ease),
+    transform var(--d-1) var(--ease);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn--ember {
+  background: var(--ember);
+  color: var(--ash-0);
+}
+
+.btn--ember:hover {
+  background: var(--ember-hover);
+}
+
+.btn--ember:focus-visible {
+  outline-color: var(--ember);
+}
+
+.btn--ghost {
+  border-color: var(--line-3);
+  color: var(--bone);
+  background: transparent;
+}
+
+.btn--ghost:hover {
+  border-color: var(--bone);
+}
+
+.btn--lg {
+  min-height: 56px;
+  padding: 0 var(--s-6);
+  font-size: 1.1875rem;
+}
+
+.btn__arrow {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  transition: transform var(--d-2) var(--ease);
+}
+
+.btn:hover .btn__arrow {
+  transform: translateX(3px);
+}
+
+.textlink {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  gap: var(--s-2);
+  border-bottom: 1px solid transparent;
+  transition: color var(--d-2) var(--ease);
+}
+
+.textlink span {
+  border-bottom: 1px solid var(--line-3);
+  padding-bottom: 2px;
+  transition: border-color var(--d-2) var(--ease);
+}
+
+.textlink:hover span {
+  border-color: var(--bone);
+}
+
+/* ---------- reveal + heat bloom ---------- */
+
+html[data-motion="on"].js [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+  transition:
+    opacity var(--d-4) var(--ease),
+    transform var(--d-4) var(--ease);
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+
+html[data-motion="on"].js [data-reveal][data-in] {
+  opacity: 1;
+  transform: none;
+}
+
+/* heat bloom: a radial clip-path wipe from a point (--bx, --by). The clip sits on the children, never on the
+   observed .bloom itself: Chrome counts a target's own clip-path, so a fully clipped target never intersects
+   and would stay hidden for good. */
+html[data-motion="on"].js .bloom > * {
+  clip-path: circle(0% at var(--bx, 50%) var(--by, 50%));
+  transition: clip-path var(--d-bloom) var(--ease-out);
+}
+
+html[data-motion="on"].js .bloom[data-in] > * {
+  clip-path: circle(var(--br, 150%) at var(--bx, 50%) var(--by, 50%));
+}
+
+html[data-motion="off"] *,
+html[data-motion="off"] *::before,
+html[data-motion="off"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  animation-delay: 0ms !important;
+  transition-duration: 0.001ms !important;
+  transition-delay: 0ms !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

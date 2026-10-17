@@ -1,0 +1,332 @@
+/* ---------- sample map (SVG) ---------- */
+
+.smap {
+  position: relative;
+  aspect-ratio: var(--map-ratio, 16 / 10);
+  background: var(--ash-1);
+  overflow: hidden;
+  isolation: isolate;
+  touch-action: pan-y;
+}
+
+.smap__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.smap__svg * {
+  vector-effect: non-scaling-stroke;
+}
+
+.smap__img {
+  opacity: 0.95;
+}
+
+.smap__img--th {
+  opacity: 0;
+  transition: opacity var(--d-4) var(--ease);
+}
+
+.smap[data-thermal] .smap__img--th {
+  opacity: 1;
+}
+
+.smap__grid path {
+  stroke: rgba(236, 231, 224, 0.05);
+  stroke-width: 1;
+  fill: none;
+}
+
+.smap__contours path {
+  fill: none;
+  stroke: rgba(236, 231, 224, 0.11);
+  stroke-width: 0.8;
+}
+
+.smap__contours path.is-index {
+  stroke: rgba(236, 231, 224, 0.22);
+  stroke-width: 1;
+}
+
+.smap[data-thermal] .smap__contours path {
+  stroke: rgba(20, 0, 46, 0.25);
+}
+
+.smap__river {
+  fill: none;
+  stroke: rgba(150, 152, 156, 0.7);
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+}
+
+.smap__water {
+  fill: rgba(12, 12, 13, 0.72);
+  stroke: rgba(236, 231, 224, 0.42);
+  stroke-width: 1;
+}
+
+.smap[data-thermal] .smap__water {
+  fill: rgba(20, 0, 46, 0.85);
+  stroke: rgba(74, 12, 106, 0.9);
+}
+
+.smap__road path {
+  fill: none;
+  stroke: rgba(140, 135, 129, 0.75);
+  stroke-width: 3.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.smap__road--in path {
+  stroke: #1d1b19;
+  stroke-width: 1.4;
+}
+
+.smap__base-infra path {
+  fill: none;
+  stroke: rgba(140, 135, 129, 0.55);
+  stroke-width: 1;
+}
+
+.smap__base-infra .smap__dam {
+  stroke-width: 4;
+}
+
+.smap__layer {
+  transition: opacity var(--d-3) var(--ease);
+}
+
+.smap__line {
+  fill: none;
+  stroke: var(--bone);
+  stroke-width: 1.2;
+  stroke-dasharray: 1 0;
+}
+
+.smap__tower {
+  fill: var(--ash-0);
+  stroke: var(--bone);
+  stroke-width: 1.2;
+}
+
+.smap__dam--on {
+  fill: none;
+  stroke: var(--bone);
+  stroke-width: 5 !important;
+}
+
+.smap__box {
+  fill: rgba(236, 231, 224, 0.08);
+  stroke: var(--bone);
+  stroke-width: 1.2;
+}
+
+.smap__box--sub {
+  fill: rgba(236, 231, 224, 0.12);
+}
+
+.smap__esc {
+  stroke: #e8452c;
+  stroke-width: 1.4;
+  stroke-dasharray: 6 4;
+  fill-opacity: 0.55;
+}
+
+.smap__iso {
+  fill: none;
+  stroke-width: 1.4;
+  stroke-dasharray: 3 3;
+  transition: opacity var(--d-3) var(--ease);
+}
+
+.smap__area {
+  fill: rgba(255, 158, 27, 0.26);
+  stroke: #ff9e1b;
+  stroke-width: 1.6;
+  transition: d var(--d-4) var(--ease);
+}
+
+.smap__patrol {
+  fill: none;
+  stroke: var(--ember);
+  stroke-width: 2;
+  stroke-dasharray: 7 5;
+  stroke-linejoin: round;
+}
+
+.smap__flight {
+  fill: none;
+  stroke: var(--bone);
+  stroke-width: 1.2;
+  stroke-dasharray: 1.5 5;
+  stroke-linecap: round;
+  opacity: 0.85;
+}
+
+.smap__cp {
+  fill: var(--ash-0);
+  stroke: var(--ember);
+  stroke-width: 1.4;
+}
+
+.smap__obs circle {
+  fill: rgba(236, 231, 224, 0.9);
+  stroke: var(--ash-0);
+  stroke-width: 1.5;
+}
+
+.smap__obs path {
+  stroke: var(--bone);
+  stroke-width: 1;
+}
+
+.smap__truck {
+  fill: var(--ember);
+  stroke: var(--ash-0);
+  stroke-width: 2;
+}
+
+.smap__ring {
+  fill: none;
+  stroke: #ffe6a0;
+  stroke-width: 1.2;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+html[data-motion="on"] .smap__ring {
+  animation: ring 3.2s var(--ease-out) infinite;
+}
+
+html[data-motion="on"] .smap__ring--b {
+  animation-delay: 1.6s;
+}
+
+html[data-motion="off"] .smap__ring--a {
+  transform: scale(1.5);
+  opacity: 0.6;
+}
+
+html[data-motion="off"] .smap__ring--b {
+  transform: scale(2.2);
+  opacity: 0.3;
+}
+
+@keyframes ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+/* labels (HTML so they stay legible at every size) */
+
+.smap__labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.smap__lbl {
+  position: absolute;
+  padding: 2px 6px;
+  background: rgba(15, 14, 13, 0.82);
+  color: var(--bone-2);
+  white-space: nowrap;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  transition: opacity var(--d-3) var(--ease);
+  transform: translate(8px, -50%);
+}
+
+.smap__lbl--l {
+  transform: translate(calc(-100% - 8px), -50%);
+}
+
+.smap__lbl--t {
+  transform: translate(-50%, calc(-100% - 6px));
+}
+
+.smap__lbl--b {
+  transform: translate(-50%, 6px);
+}
+
+.smap__lbl--cp {
+  transform: translate(10px, -50%);
+  padding: 1px 4px;
+  background: rgba(15, 14, 13, 0.7);
+}
+
+.smap__lbl--iso {
+  transform: translate(4px, -50%);
+}
+
+.smap__lbl.is-heat {
+  color: #ffe6a0;
+}
+
+.smap__lbl.is-ember {
+  color: var(--ember);
+}
+
+.smap__loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+/* pointer readout */
+
+.smap__cursor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.smap__cx,
+.smap__cy {
+  position: absolute;
+  background: rgba(236, 231, 224, 0.35);
+}
+
+.smap__cx {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.smap__cy {
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+.smap__readout {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  padding: 4px 8px;
+  background: rgba(15, 14, 13, 0.82);
+  color: var(--bone-2);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+@media (max-width: 599px) {
+  .smap__lbl {
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    padding: 1px 4px;
+  }
+  .smap__lbl--cp {
+    display: none;
+  }
+}

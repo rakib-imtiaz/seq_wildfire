@@ -1,0 +1,366 @@
+.mapsec {
+  background: var(--ash-0);
+  border-top: 1px solid var(--line);
+}
+
+.mapsec__head {
+  display: grid;
+  gap: var(--s-5);
+}
+
+.mapsec__head .lead {
+  max-width: 52ch;
+}
+
+.mapsec__ws {
+  margin-top: var(--s-7);
+  display: grid;
+  gap: var(--s-6);
+}
+
+.mapsec__mapcol {
+  display: grid;
+  gap: var(--s-4);
+  min-width: 0;
+}
+
+.mapsec__frame {
+  position: relative;
+  box-shadow: 0 0 0 1px var(--line-2);
+}
+
+@media (max-width: 767px) {
+  .mapsec__frame {
+    margin-inline: calc(var(--gutter) * -1);
+    box-shadow: none;
+    border-block: 1px solid var(--line-2);
+  }
+}
+
+.mapsec__stamp {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  padding: 5px 9px;
+  background: var(--bone);
+  color: var(--ash-0);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  pointer-events: none;
+}
+
+.mapsec__north {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  color: var(--bone);
+  pointer-events: none;
+}
+
+.mapsec__north svg {
+  width: 10px;
+  height: 14px;
+}
+
+.mapsec__scale {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12px;
+  padding-right: 12px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 8px;
+  color: var(--bone-2);
+  pointer-events: none;
+}
+
+.mapsec__scale i {
+  display: block;
+  height: 6px;
+  border: 1px solid var(--bone-2);
+  border-top: 0;
+}
+
+.mapsec__note {
+  color: var(--bone-3);
+  font-size: var(--t-small);
+}
+
+/* panel */
+
+.mapsec__panel {
+  display: grid;
+  gap: var(--s-6);
+  align-content: start;
+}
+
+.mapsec__group {
+  display: grid;
+  gap: var(--s-3);
+  min-width: 0;
+}
+
+.mapsec__legend {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding-bottom: var(--s-2);
+  border-bottom: 1px solid var(--line-2);
+  color: var(--smoke);
+}
+
+.mapsec__all {
+  min-height: var(--tap);
+  padding: 0 4px;
+  background: transparent;
+  border: 0;
+  color: var(--bone-2);
+  text-decoration: underline;
+  text-decoration-color: var(--line-3);
+  text-underline-offset: 4px;
+}
+
+.mapsec__all:hover {
+  color: var(--bone);
+}
+
+.mapsec__tval {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--bone);
+}
+
+.mapsec__layers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.layer {
+  width: 100%;
+  height: 100%;
+  min-height: 52px;
+  display: grid;
+  grid-template-columns: 24px 1fr 12px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--ash-0);
+  border: 0;
+  text-align: left;
+  color: var(--smoke);
+  transition:
+    color var(--d-2) var(--ease),
+    background-color var(--d-2) var(--ease);
+}
+
+.layer:hover {
+  background: var(--ash-1);
+}
+
+.layer[aria-pressed="true"] {
+  color: var(--bone);
+}
+
+.layer__sw svg {
+  width: 24px;
+  height: 24px;
+  opacity: 0.35;
+  transition: opacity var(--d-2) var(--ease);
+}
+
+.layer[aria-pressed="true"] .layer__sw svg {
+  opacity: 1;
+}
+
+.layer__txt {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.layer__name {
+  font-family: var(--f-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+  line-height: 1.1;
+}
+
+.layer__brief {
+  display: none;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--smoke);
+}
+
+.layer__state {
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--line-3);
+}
+
+.layer[aria-pressed="true"] .layer__state {
+  background: var(--bone);
+  border-color: var(--bone);
+}
+
+/* time scrubber */
+
+.scrub {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: var(--tap);
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.scrub::-webkit-slider-runnable-track {
+  height: 2px;
+  background: linear-gradient(90deg, #ff9e1b 0 calc(var(--t, 1) * 100%), var(--line-2) calc(var(--t, 1) * 100%) 100%);
+}
+
+.scrub::-moz-range-track {
+  height: 2px;
+  background: var(--line-2);
+}
+
+.scrub::-moz-range-progress {
+  height: 2px;
+  background: #ff9e1b;
+}
+
+.scrub::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -8px;
+  background: var(--bone);
+  border: 3px solid var(--ash-0);
+  box-shadow: 0 0 0 1px var(--bone);
+  border-radius: 0;
+}
+
+.scrub::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: var(--bone);
+  border: 3px solid var(--ash-0);
+  box-shadow: 0 0 0 1px var(--bone);
+  border-radius: 0;
+}
+
+.scrub:focus-visible {
+  outline: 2px solid var(--bone);
+  outline-offset: 2px;
+}
+
+.scrub__ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: -6px;
+}
+
+.scrub__tick {
+  min-height: var(--tap);
+  padding: 0 4px;
+  background: transparent;
+  border: 0;
+  color: var(--smoke);
+}
+
+.scrub__tick[aria-pressed="true"] {
+  color: var(--bone);
+}
+
+.scrub__tick:first-child {
+  padding-left: 0;
+}
+
+.scrub__tick:last-child {
+  padding-right: 0;
+}
+
+@media (max-width: 419px) {
+  .mapsec__layers {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* phones: the hotspot sits near the top of the cropped map, so the stamp moves to the bottom-left,
+   and the pointer readout (hover only) is dropped */
+@media (max-width: 767px) {
+  .mapsec__stamp {
+    top: auto;
+    bottom: 10px;
+  }
+}
+
+@media (hover: none), (max-width: 767px) {
+  .mapsec__frame .smap__readout,
+  .mapsec__frame .smap__cursor {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .layer__brief {
+    display: block;
+  }
+  .mapsec__layers {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .mapsec__head {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    align-items: end;
+  }
+  .mapsec__head .label {
+    grid-column: 1 / -1;
+  }
+  .mapsec__head .h2 {
+    grid-column: 1 / span 6;
+  }
+  .mapsec__head .lead {
+    grid-column: 8 / span 5;
+  }
+  .mapsec__ws {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    align-items: start;
+  }
+  .mapsec__mapcol {
+    grid-column: 1 / span 8;
+  }
+  .mapsec__panel {
+    grid-column: 9 / span 4;
+  }
+  .mapsec__layers {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 1600px) {
+  .mapsec__mapcol {
+    grid-column: 1 / span 9;
+  }
+  .mapsec__panel {
+    grid-column: 10 / span 3;
+  }
+}

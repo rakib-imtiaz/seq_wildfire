@@ -1,0 +1,5 @@
+{
+  "_note": "Optional assets the table loads only when listed here (no 404 probes). m3t: module path relative to /table/ exporting buildM3T; smoke: sprite paths relative to /table/ (greyscale on black, webp).",
+  "m3t": "js/m3t/model.js",
+  "smoke": []
+}

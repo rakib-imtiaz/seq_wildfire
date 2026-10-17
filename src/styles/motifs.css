@@ -1,0 +1,264 @@
+/* ---------- SAMPLE tag + telemetry stamps ---------- */
+
+.sample {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 6px;
+  border: 1px solid var(--line-3);
+  color: var(--bone);
+  letter-spacing: 0.14em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.stamp {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 0;
+  color: var(--smoke);
+}
+
+.stamp__item {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.stamp__item + .stamp__item::before {
+  content: "";
+  width: 1px;
+  height: 10px;
+  margin: 0 10px;
+  background: var(--line-3);
+}
+
+.stamp .stamp__item:first-of-type {
+  color: var(--bone);
+}
+
+.stamp .sample {
+  margin-left: 12px;
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  margin-right: 10px;
+  background: var(--ember);
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+html[data-motion="on"] .live-dot {
+  animation: live 2.4s var(--ease-calm) infinite;
+}
+
+@keyframes live {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.ticker {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- reticle ---------- */
+
+.reticle {
+  color: var(--bone);
+  overflow: visible;
+}
+
+/* ---------- heat legend ---------- */
+
+.heatlegend {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.heatlegend__bar {
+  height: 6px;
+  background: var(--ironbow);
+}
+
+.heatlegend__ticks {
+  display: flex;
+  justify-content: space-between;
+  color: var(--bone-2);
+}
+
+.heatlegend__cap {
+  margin-top: 2px;
+}
+
+/* ---------- camera frame corners ---------- */
+
+.corners {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.corners i {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 0 solid var(--line-3);
+}
+
+.corners i:nth-child(1) {
+  left: 0;
+  top: 0;
+  border-left-width: 1px;
+  border-top-width: 1px;
+}
+
+.corners i:nth-child(2) {
+  right: 0;
+  top: 0;
+  border-right-width: 1px;
+  border-top-width: 1px;
+}
+
+.corners i:nth-child(3) {
+  right: 0;
+  bottom: 0;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+}
+
+.corners i:nth-child(4) {
+  left: 0;
+  bottom: 0;
+  border-left-width: 1px;
+  border-bottom-width: 1px;
+}
+
+/* ---------- photo slots ---------- */
+
+.photo {
+  position: relative;
+  aspect-ratio: var(--ratio, var(--pr, 3 / 2));
+  overflow: hidden;
+  background: var(--ash-2);
+  isolation: isolate;
+}
+
+.photo > img,
+.photo > .scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 0 1px var(--line);
+  pointer-events: none;
+}
+
+/* ---------- thermal pair + lens ---------- */
+
+@property --lr {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+.tpair {
+  --lr: 0px;
+  --lens: clamp(56px, 9vw, 92px);
+  position: relative;
+  aspect-ratio: var(--ratio, var(--pr, 4 / 5));
+  overflow: hidden;
+  background: var(--ash-2);
+  touch-action: pan-y;
+  isolation: isolate;
+  transition: --lr var(--d-3) var(--ease);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.tpair[data-active] {
+  --lr: var(--lens);
+}
+
+@media (hover: none) {
+  .tpair {
+    --lr: calc(var(--lens) * 0.82);
+  }
+}
+
+html[data-motion="off"] .tpair {
+  --lr: calc(var(--lens) * 0.82);
+}
+
+.tpair__layer {
+  position: absolute;
+  inset: 0;
+}
+
+.tpair__layer > img,
+.tpair__layer > .scene {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tpair__thermal {
+  -webkit-mask-image: radial-gradient(circle var(--lr) at var(--lx, 50%) var(--ly, 50%), #000 97%, transparent 100%);
+  mask-image: radial-gradient(circle var(--lr) at var(--lx, 50%) var(--ly, 50%), #000 97%, transparent 100%);
+}
+
+.tpair__rim {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(var(--lr) * 2);
+  height: calc(var(--lr) * 2);
+  border-radius: 50%;
+  border: 1px solid rgba(236, 231, 224, 0.85);
+  transform: translate(calc(var(--lx, 50%) - var(--lr)), calc(var(--ly, 50%) - var(--lr)));
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.tpair__rim i {
+  position: absolute;
+  inset: -7px;
+  background:
+    linear-gradient(var(--bone), var(--bone)) top center / 1px 8px no-repeat,
+    linear-gradient(var(--bone), var(--bone)) bottom center / 1px 8px no-repeat,
+    linear-gradient(var(--bone), var(--bone)) left center / 8px 1px no-repeat,
+    linear-gradient(var(--bone), var(--bone)) right center / 8px 1px no-repeat;
+  opacity: 0.85;
+}
+
+.tpair__label {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  padding: 4px 7px;
+  background: rgba(15, 14, 13, 0.72);
+  color: var(--bone-2);
+}
+
+.tpair::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 0 1px var(--line);
+  pointer-events: none;
+}

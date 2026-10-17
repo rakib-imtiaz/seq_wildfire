@@ -1,0 +1,129 @@
+.stds {
+  background: var(--ash-1);
+  border-top: 1px solid var(--line);
+}
+
+.stds__grid {
+  display: grid;
+  gap: var(--s-7);
+}
+
+.stds__copy {
+  display: grid;
+  gap: var(--s-5);
+  align-content: start;
+}
+
+.stds__rules {
+  display: grid;
+  gap: var(--s-3);
+  margin-top: var(--s-3);
+}
+
+.stds__rules ol {
+  border-top: 1px solid var(--line-2);
+}
+
+.stds__rules li {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  align-items: baseline;
+  gap: var(--s-3);
+  padding: var(--s-3) 0;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--f-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+}
+
+.stds__cert {
+  margin-top: var(--s-2);
+}
+
+@media (min-width: 1024px) {
+  .stds__grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    align-items: center;
+  }
+  .stds__copy {
+    grid-column: 1 / span 6;
+  }
+  .stds__photo {
+    grid-column: 8 / span 5;
+  }
+}
+
+/* ---------- CTA band ---------- */
+
+.cta {
+  position: relative;
+  min-height: clamp(520px, 72svh, 860px);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  background: var(--ash-0);
+  border-top: 1px solid var(--line);
+  isolation: isolate;
+}
+
+.cta__photo {
+  position: absolute !important;
+  inset: 0;
+  aspect-ratio: auto !important;
+  z-index: -2;
+}
+
+.cta__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(15, 14, 13, 0.55) 0%, rgba(15, 14, 13, 0) 30%),
+    linear-gradient(0deg, rgba(15, 14, 13, 0.96) 6%, rgba(15, 14, 13, 0.35) 55%, rgba(15, 14, 13, 0.1) 100%);
+}
+
+.cta__in {
+  padding-block: var(--s-9) clamp(56px, 8svh, 104px);
+  display: grid;
+  gap: var(--s-5);
+}
+
+.cta__title {
+  font-size: clamp(2.5rem, 1.4rem + 5vw, 6.25rem);
+  max-width: 18ch;
+  text-wrap: balance;
+}
+
+.cta__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-3) var(--s-6);
+  margin-top: var(--s-3);
+}
+
+.cta__phone {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  color: var(--bone-2);
+  border-bottom: 1px solid transparent;
+}
+
+.cta__phone:hover {
+  color: var(--bone);
+}
+
+@media (max-width: 479px) {
+  .cta__actions .btn {
+    width: 100%;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.1;
+    padding-block: 12px;
+  }
+}

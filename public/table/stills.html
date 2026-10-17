@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Command Table stills (dev tool)</title>
+  <meta name="robots" content="noindex">
+  <script type="importmap">
+    { "imports": {
+      "three": "./vendor/three/build/three.module.min.js",
+      "three/addons/": "./vendor/three/examples/jsm/"
+    } }
+  </script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+  <style>
+    html, body { margin: 0; background: #0f0e0d; color: #8c8781; font: 12px/1.4 monospace; }
+    .box { position: absolute; left: 0; top: 0; overflow: hidden; }
+    #log { position: fixed; right: 8px; bottom: 8px; white-space: pre; z-index: 9; }
+  </style>
+</head>
+<body>
+  <div class="box" id="hero"></div>
+  <div class="box" id="steps"></div>
+  <pre id="log"></pre>
+  <script type="module">
+    // Dev tool: renders the site's stills from the live scene and POSTs them to /__still (vite dev only):
+    //   hero-{desk|sq|tall|tab|phone}-{visible|thermal}.webp, hero-{...}.json, step{1..5}-{desk|phone}.webp
+    // (the hero stills are framed like the live hero: the site's copy block and header at that size, its lens radius)
+    // Run: /table/stills.html?run=1 (all) or ?run=hero / ?run=steps; ?q=high for the best tier; &only=phone,tab
+    // limits the hero to some variants.
+    import { mountTable } from './js/table.js';
+    const qs = new URLSearchParams(location.search);
+    const log = (s) => { document.getElementById('log').textContent += s + '\n'; console.info('[stills]', s); };
+    const post = async (name, dataUrl) => (await fetch('/__still', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, dataUrl, dir: 'media' }) })).text();
+    const size = (el, w, h) => { el.style.width = w + 'px'; el.style.height = h + 'px'; };
+    await document.fonts.ready;
+    const SIZES = {
+      hero: { desk: [1600, 1000, 1], sq: [1300, 1200, 1], tall: [1024, 1366, 1], tab: [1000, 600, 1], phone: [375, 439, 2] },
+      steps: { desk: [1100, 960, 1], phone: [390, 780, 2] },
+    };
+    // the site's hero layout per still (measured on the live page): header height, copy block, lens radius
+    const HERO_INSETS = {
+      desk: { top: 76, avoid: [64, 277, 705, 887], lens: 99, margin: 40, leftLimit: 0.44 },
+      sq: { top: 76, avoid: [57, 512, 592, 1093], lens: 81, margin: 40, leftLimit: 0.44 },
+      tall: { top: 76, avoid: [45, 630, 537, 1221], lens: 63, margin: 40, leftLimit: 0.44 },
+      tab: { top: 0, avoid: null, lens: 88, margin: 32, leftLimit: 0 },
+      phone: { top: 0, avoid: null, lens: 45, margin: 18, leftLimit: 0 },
+    };
+    const run = qs.get('run') || '';
+    const heroEl = document.getElementById('hero'), stepsEl = document.getElementById('steps');
+    window.__stillsDone = false;
+
+    const only = qs.get('only') ? qs.get('only').split(',') : null;   // e.g. ?run=hero&only=phone,tab
+    async function heroStills() {
+      for (const [v, [w, h, dpr]] of Object.entries(SIZES.hero)) {
+        if (only && !only.includes(v)) continue;
+        size(heroEl, w, h); size(stepsEl, 1, 1);
+        const t = mountTable(heroEl, { mode: 'hero', still: true, dpr });
+        t.resize();
+        t.setInsets(HERO_INSETS[v]);
+        t.setLens({ x: 0.5, y: 0.5, r: 0.1, active: false });
+        await post(`hero-${v}-visible.webp`, t.capture('image/webp', 0.86));
+        t.setLens({ x: 0.5, y: 0.5, r: 4, active: true });             // the whole frame in thermal
+        await post(`hero-${v}-thermal.webp`, t.capture('image/webp', 0.86));
+        // the readout grid for the lite lens: per cell, the field max (SAMPLE) and the grid position
+        const hp = t.getHotspot();
+        const cols = v === 'phone' ? 24 : 48, rows = v === 'phone' ? 28 : 30;
+        const maxC = [], e = [], n = [];
+        for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+          const r = t.setLens({ x: (i + 0.5) / cols, y: (j + 0.5) / rows, r: 0.55 / cols, active: true }) || {};
+          maxC.push(r.maxC ?? null); e.push(r.e ?? null); n.push(r.n ?? null);
+        }
+        const data = { w, h, hotspot: { x: hp.x, y: hp.y }, rest: hp.rest, inward: hp.inward, grid: { cols, rows, maxC, e, n } };
+        await post(`hero-${v}.json`, 'data:application/json;base64,' + btoa(JSON.stringify(data)));
+        t.dispose();
+        log(`hero ${v} ${w}x${h}@${dpr} done`);
+      }
+    }
+
+    async function stepStills() {
+      for (const [v, [w, h, dpr]] of Object.entries(SIZES.steps)) {
+        size(stepsEl, w, h); size(heroEl, 1, 1);
+        const t = mountTable(stepsEl, { mode: 'steps', still: true, dpr });
+        t.resize();
+        t.setInsets(v === 'phone' ? { top: 64, bottom: 16 } : { top: 70, bottom: 20 });
+        for (let k = 1; k <= 5; k++) {
+          t.renderFrame((k - 0.5) / 5);
+          const c = document.createElement('canvas'); c.width = w * dpr; c.height = h * dpr;
+          const g = c.getContext('2d');
+          g.drawImage(t.canvas, 0, 0);
+          if (k !== 5) await t.overlay.paintTo(g, dpr);
+          await post(`step${k}-${v}.webp`, c.toDataURL('image/webp', 0.84));
+        }
+        t.dispose();
+        log(`steps ${v} ${w}x${h}@${dpr} done`);
+      }
+    }
+    if (run === '1' || run === 'hero') await heroStills();
+    if (run === '1' || run === 'steps') await stepStills();
+    window.__stillsDone = true;
+    log('done');
+  </script>
+</body>
+</html>
