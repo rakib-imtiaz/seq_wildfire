@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent as RKeyboardEvent, type PointerEvent as RPointerEvent } from "react";
 import { HOW } from "../data/copy";
-import { FrameCorners, SectionLabel, Stamp } from "../components/Motifs";
+import { FrameCorners, SectionLabel } from "../components/Motifs";
 import { clamp, flags, motionOn, useReveal } from "../lib/motion";
 import { mountTableInto, safe, type TableHandle } from "../lib/table3d";
 import { useZone } from "../lib/zone";
@@ -195,9 +195,6 @@ export function Steps() {
           <h2 id="how-title" className="h2" data-reveal>
             {HOW.title}
           </h2>
-          <p className="lead" data-reveal style={{ ["--i" as string]: 1 }}>
-            {HOW.intro}
-          </p>
         </div>
         <ol className="vh">
           {HOW.steps.map((s) => (
@@ -267,12 +264,8 @@ export function Steps() {
                       data-on={s.n === step ? "" : undefined}
                       aria-hidden={s.n !== step}
                     >
-                      <p className="mono mono--s smoke steps__cap-n">
-                        Step {String(s.n).padStart(2, "0")}
-                      </p>
                       <h3 className="h3 steps__cap-title">{s.title}</h3>
                       <p className="steps__cap-text">{s.text}</p>
-                      <Stamp items={s.stamp} className="steps__cap-stamp" />
                     </article>
                   ))}
                 </div>

@@ -26,10 +26,7 @@ export function Applications() {
           <h2 id="apps-title" className="h2" data-reveal>
             {APPLICATIONS.title}
           </h2>
-          <p className="lead" data-reveal style={{ ["--i" as string]: 1 }}>
-            {APPLICATIONS.intro}
-          </p>
-          <p className="apps__hint mono mono--s smoke" data-reveal style={{ ["--i" as string]: 2 }}>
+          <p className="apps__hint mono mono--s smoke" data-reveal style={{ ["--i" as string]: 1 }}>
             <span className="hint-fine">Hover a site to see it in thermal</span>
             <span className="hint-touch">Drag across a site to see it in thermal</span>
           </p>
@@ -40,9 +37,7 @@ export function Applications() {
             <li key={a.id} className="app" data-reveal style={{ ["--i" as string]: i % 2 }}>
               <ThermalPair pair={PAIRS[a.id]} kind={a.id} ratio={[4, 5]} seed={30 + i * 7} rest={REST[a.id]} />
               <div className="app__cap">
-                <p className="mono mono--s smoke">App {String(i + 1).padStart(2, "0")}</p>
                 <h3 className="h3 app__title">{a.title}</h3>
-                <p className="app__text">{a.text}</p>
               </div>
             </li>
           ))}

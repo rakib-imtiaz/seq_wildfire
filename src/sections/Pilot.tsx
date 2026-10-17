@@ -77,6 +77,9 @@ function M3TSchematic() {
   );
 }
 
+/** The specs worth a glance (the full list stays in copy.ts). */
+const KEY_SPECS = ["Thermal", "Low gain", "Wide", "Hybrid zoom", "Flight time", "Weight"];
+
 export function Pilot() {
   const ref = useRef<HTMLElement>(null);
   const slotRef = useRef<HTMLDivElement>(null);
@@ -127,18 +130,8 @@ export function Pilot() {
             <p className="lead" data-reveal style={{ ["--i" as string]: 1 }}>
               {PILOT.text}
             </p>
-            <dl className="pilot__creds" data-reveal style={{ ["--i" as string]: 2 }}>
-              <div>
-                <dt className="mono mono--s smoke">Pilot certificate</dt>
-                <dd>{PILOT.cert}</dd>
-              </div>
-              <div>
-                <dt className="mono mono--s smoke">Aircraft</dt>
-                <dd>{PILOT.aircraft}</dd>
-              </div>
-            </dl>
           </div>
-          <PhotoSlot media={MEDIA.pilotPortrait} kind="pilot" ratio={[4, 5]} seed={11} className="pilot__portrait" origin={["40%", "70%"]} />
+          <PhotoSlot media={MEDIA.pilotPortrait} kind="pilot" ratio={[4, 5]} seed={11} className="pilot__portrait" origin={["46%", "68%"]} sizes="(min-width: 1024px) 30vw, (min-width: 560px) 520px, 100vw" />
         </div>
 
         <div className="pilot__kit">
@@ -154,7 +147,7 @@ export function Pilot() {
               <span>{PILOT.specSource}</span>
             </p>
             <ul className="chips" aria-label="Aircraft specifications">
-              {PILOT.specs.map((s, i) => (
+              {PILOT.specs.filter((s) => KEY_SPECS.includes(s.k)).map((s, i) => (
                 <li key={s.k} className="chip" data-reveal style={{ ["--i" as string]: i % 4 }}>
                   <span className="chip__k mono mono--s">{s.k}</span>
                   <span className="chip__v mono">{s.v}</span>

@@ -163,10 +163,27 @@
   color: var(--smoke);
 }
 
-.svc-report__thumb .scene {
+.svc-report__thumb .scene,
+.svc-report__img {
   width: 100%;
   aspect-ratio: 4 / 3;
   box-shadow: 0 0 0 1px var(--line);
+}
+
+/* 1.6x crop centred on the stump (at 67% / 28% of the photo), so the hotspot reads at thumbnail size */
+.svc-report__img {
+  position: relative;
+  overflow: hidden;
+}
+
+.svc-report__img img {
+  position: absolute;
+  left: -57%;
+  top: 0;
+  width: 160%;
+  max-width: none;
+  height: 160%;
+  object-fit: cover;
 }
 
 @media (min-width: 1024px) {

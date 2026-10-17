@@ -1,0 +1,214 @@
+/*
+ * Hero variant 3 (?hero=3): the 3D command table stays; a dim, slow ambient clip (smoke drifting over ridges)
+ * plays behind the whole hero. Everything is scoped under .hero--ambient.
+ *
+ * The WebGL canvas and the poster stills are opaque (a dark room around the slab), so the stage's canvas and stills
+ * (.hero__3d, .hero__cv) are masked: an opaque core over everywhere the slab can sit, fading out over the room to
+ * reveal the clip. The core per breakpoint comes from the engine's own solveHero run for each stage size (with the
+ * measured, the engine's default and no copy block) plus the poster still under object-fit: cover, with margin.
+ * The lens ring and readout (.lens) are never masked, and the lens's rest + drift area lies inside the core, so the
+ * heat view inside the ring is never faded either.
+ */
+
+.hero--ambient {
+  /* the clip */
+  --amb-o: 0.5; /* opacity over the hero's ash ground */
+  --amb-pos: 20% 0%; /* object-position: the smoke column (left of centre in the clip) in view on narrow screens */
+  --amb-media-h: calc(var(--header-h) + clamp(300px, 52svh, 560px) + 72px); /* header + stage (hero.css) + a tail */
+
+  /*
+   * the stage mask, in stage coordinates: opaque from --amb-y0 to --amb-y1 (fading over --amb-yf beyond each),
+   * and right of --amb-x0 (fading over --amb-xf to its left).
+   * Phones (stage 300..560 px tall): the slab is centred, at most 0.31 x the width above and below the centre
+   * (360..430 px wide: 0.301 to 0.306); the fade ends exactly at the stage's top and bottom edges.
+   */
+  --amb-y0: max(14px, calc(50% - 31vw - 14px));
+  --amb-y1: calc(100% - var(--amb-y0));
+  --amb-yf: var(--amb-y0);
+  --amb-x0: 0%;
+  --amb-xf: 0%;
+}
+
+/* tablets (stage 360..620 px tall): the slab fills the stage to its 32 px margins (the poster still to 6.7 %);
+   only the outer 4 % fades, which softens the stage's top and bottom seams */
+@media (min-width: 600px) {
+  .hero--ambient {
+    --amb-media-h: calc(var(--header-h) + clamp(360px, 50svh, 620px) + 96px);
+    --amb-y0: 4%;
+    --amb-y1: 96%;
+    --amb-yf: 4%;
+  }
+}
+
+/* landscape phones and wide tablet stages (stage aspect over the tab still's 1.67, i.e. a viewport of 4:5 or
+   wider below 1024 px): the poster still is cropped by the stage's top and bottom edges, and on a 300-360 px stage
+   the lens (kept 8 px inside the stage) can reach them, so no top or bottom fade here (the grade softens the seam) */
+@media (max-width: 1023px) and (min-aspect-ratio: 4/5) {
+  .hero--ambient {
+    --amb-y0: 0%;
+    --amb-y1: 100%;
+    --amb-yf: 0%;
+  }
+}
+
+/*
+ * desktop (the stage fills the hero, the slab in the right 56 %): the slab is width-bound, so its height follows the
+ * width. Centre 52-54 % of the stage, half-height at most 0.19 x the width (1024x660 to 3440x1440, live and poster).
+ * Left of the slab (x >= 0.41 at every size checked) the room fades out behind the copy.
+ */
+@media (min-width: 1024px) {
+  .hero--ambient {
+    --amb-pos: 40% 15%;
+    --amb-media-h: 100%;
+    --amb-y0: calc(53% - 19vw - 40px);
+    --amb-y1: calc(53% + 19vw + 40px);
+    --amb-yf: clamp(100px, 16%, 220px);
+    --amb-x0: 39%;
+    --amb-xf: 17%;
+  }
+}
+
+/* near-square desktop stages (aspect 0.88..1.3): the poster still keeps the slab at 0.33..0.71 of the height */
+@media (min-width: 1024px) and (max-aspect-ratio: 13/10) {
+  .hero--ambient {
+    --amb-pos: 25% 15%;
+    --amb-y0: min(29%, calc(53% - 19vw - 40px));
+    --amb-y1: max(75%, calc(53% + 19vw + 40px));
+  }
+}
+
+/* ... and from 1024 to 1199 px wide the copy block can push the live slab up above it (0.10..0.46 at 1100x1000) */
+@media (min-width: 1024px) and (max-width: 1199px) and (max-aspect-ratio: 13/10) {
+  .hero--ambient {
+    --amb-y0: min(7%, calc(53% - 19vw - 40px));
+    --amb-y1: max(77%, calc(53% + 19vw + 40px));
+  }
+}
+
+/* tall desktop stages (aspect < 0.88: the 0.85 still switch plus a scrollbar's worth): slab 0.15..0.67 */
+@media (min-width: 1024px) and (max-aspect-ratio: 22/25) {
+  .hero--ambient {
+    --amb-y0: 10%;
+    --amb-y1: 74%;
+  }
+}
+
+.hero--ambient .hero__cv,
+.hero--ambient .hero__3d {
+  /* eased ramps (smoothstep at quarter points), so the fade has no visible edge */
+  --amb-mask-x: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0) calc(var(--amb-x0) - var(--amb-xf)),
+    rgba(0, 0, 0, 0.16) calc(var(--amb-x0) - var(--amb-xf) * 0.75),
+    rgba(0, 0, 0, 0.5) calc(var(--amb-x0) - var(--amb-xf) * 0.5),
+    rgba(0, 0, 0, 0.84) calc(var(--amb-x0) - var(--amb-xf) * 0.25),
+    #000 var(--amb-x0)
+  );
+  --amb-mask-y: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) calc(var(--amb-y0) - var(--amb-yf)),
+    rgba(0, 0, 0, 0.16) calc(var(--amb-y0) - var(--amb-yf) * 0.75),
+    rgba(0, 0, 0, 0.5) calc(var(--amb-y0) - var(--amb-yf) * 0.5),
+    rgba(0, 0, 0, 0.84) calc(var(--amb-y0) - var(--amb-yf) * 0.25),
+    #000 var(--amb-y0),
+    #000 var(--amb-y1),
+    rgba(0, 0, 0, 0.84) calc(var(--amb-y1) + var(--amb-yf) * 0.25),
+    rgba(0, 0, 0, 0.5) calc(var(--amb-y1) + var(--amb-yf) * 0.5),
+    rgba(0, 0, 0, 0.16) calc(var(--amb-y1) + var(--amb-yf) * 0.75),
+    rgba(0, 0, 0, 0) calc(var(--amb-y1) + var(--amb-yf))
+  );
+  /* the soft rectangle = x ramp AND y ramp (without composite support the two add up: more opaque, never less) */
+  -webkit-mask-image: var(--amb-mask-x), var(--amb-mask-y);
+  -webkit-mask-composite: source-in;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-image: var(--amb-mask-x), var(--amb-mask-y);
+  mask-composite: intersect;
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+}
+
+/* ---------- the backdrop ---------- */
+
+.hero--ambient .amb {
+  position: absolute;
+  inset: 0;
+  z-index: 0; /* under the stage (next in the DOM), the desktop scrim (::before, z 1) and the copy (z 3) */
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.6s var(--ease-calm);
+}
+
+.hero--ambient .amb[data-shown] {
+  opacity: 1;
+}
+
+.hero--ambient .amb__media {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: var(--amb-media-h);
+  opacity: var(--amb-o);
+  /* below 1024 px the clip sits behind the header and the stage, then gives way to the ash ground under the copy */
+  -webkit-mask-image: linear-gradient(to bottom, #000 52%, rgba(0, 0, 0, 0.5) 76%, transparent);
+  mask-image: linear-gradient(to bottom, #000 52%, rgba(0, 0, 0, 0.5) 76%, transparent);
+}
+
+.hero--ambient .amb__poster,
+.hero--ambient .amb__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--amb-pos);
+  filter: saturate(0.8);
+}
+
+/* the clip shows only once it really plays (a blocked autoplay keeps the poster, never a play glyph) */
+.hero--ambient .amb__video {
+  opacity: 0;
+  transition: opacity 0.8s var(--ease-calm);
+}
+
+.hero--ambient .amb__video[data-playing] {
+  opacity: 1;
+}
+
+/* the grade: ash over the header band (the nav reads over the sky) and down into the next section */
+.hero--ambient .amb__grade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(15, 14, 13, 0.35) 0, rgba(15, 14, 13, 0) 120px),
+    linear-gradient(to top, rgba(15, 14, 13, 0.85) 0, rgba(15, 14, 13, 0) 22%);
+}
+
+/* tablets and landscape phones: the stage's fade is 4 % deep or none (the slab fills it), so the sky also dims
+   toward the stage's top edge and stays dim behind it: a soft horizon instead of a seam */
+@media (min-width: 600px) and (max-width: 1023px), (max-width: 1023px) and (min-aspect-ratio: 4/5) {
+  .hero--ambient .amb__grade {
+    background:
+      linear-gradient(to bottom, rgba(15, 14, 13, 0.35) 0, rgba(15, 14, 13, 0) 40px, rgba(15, 14, 13, 0.5) calc(var(--header-h) + 32px)),
+      linear-gradient(to top, rgba(15, 14, 13, 0.85) 0, rgba(15, 14, 13, 0) 22%);
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero--ambient .amb__media {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .hero--ambient .amb__grade {
+    background:
+      linear-gradient(to bottom, rgba(15, 14, 13, 0.32) 0, rgba(15, 14, 13, 0) 160px),
+      /* behind the copy (bottom left): ash, so the lead holds 4.5:1 over any frame of any clip */
+      radial-gradient(80% 72% at 0% 100%, rgba(15, 14, 13, 0.88) 0%, rgba(15, 14, 13, 0.72) 48%, rgba(15, 14, 13, 0) 100%),
+      linear-gradient(to top, rgba(15, 14, 13, 0.8) 0, rgba(15, 14, 13, 0) 20%);
+  }
+}
+
+html[data-motion="off"] .hero--ambient .amb,
+html[data-motion="off"] .hero--ambient .amb__video {
+  transition: none;
+}

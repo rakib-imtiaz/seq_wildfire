@@ -1,0 +1,214 @@
+/*
+ * Hero variant 2 (?hero=2): the "Watch the film" CTA and the full-screen film player.
+ * Scoped to .hero--film, .film-btn and .film*: nothing here touches the base hero.
+ */
+
+/* ---------- CTA row: three buttons that wrap cleanly ---------- */
+
+/* phones: one column, every CTA full width (also covers 421 to 599, where the base row goes ragged) */
+.hero--film .hero__ctas {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s-3);
+}
+
+@media (max-width: 380px) {
+  .hero--film .hero__ctas .btn {
+    padding-inline: var(--s-5);
+  }
+}
+
+/* tablet + desktop: the two existing CTAs side by side, the film under the primary, edges aligned.
+   On desktop this keeps the CTA block inside the copy column, so the 3D slab keeps its framing. */
+@media (min-width: 600px) {
+  .hero--film .hero__ctas {
+    grid-template-columns: repeat(2, max-content);
+    justify-content: start;
+  }
+}
+
+@media (min-width: 1024px) and (max-height: 820px) {
+  .hero--film .hero__ctas {
+    margin-top: var(--s-5);
+  }
+}
+
+/* ---------- the film button ---------- */
+
+.film-btn__play {
+  width: 10px;
+  height: 12px;
+  flex: 0 0 auto;
+  margin-left: -2px;
+}
+
+.film-btn__dur {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-3);
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  color: var(--bone-3);
+  transition: color var(--d-2) var(--ease);
+}
+
+.film-btn__dur::before {
+  content: "";
+  width: 1px;
+  height: 16px;
+  background: var(--line-3);
+}
+
+.film-btn:hover .film-btn__dur,
+.film-btn:focus-visible .film-btn__dur {
+  color: var(--bone-2);
+}
+
+.film-btn:focus-visible {
+  border-color: var(--bone);
+  outline: 2px solid var(--bone);
+  outline-offset: 3px;
+}
+
+/* ---------- player: native modal <dialog> ---------- */
+
+.film {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom))
+    max(12px, env(safe-area-inset-left));
+  border: 0;
+  background: transparent;
+  color: var(--bone);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+.film[open] {
+  display: grid;
+  place-items: center;
+}
+
+/* literal values: older engines do not inherit custom properties into ::backdrop */
+.film::backdrop {
+  background: rgba(15, 14, 13, 0.92);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+/* 16:9 sized to fit the viewport with margins: min(92vw, (92svh - chrome) * 16/9) */
+.film__frame {
+  display: grid;
+  gap: var(--s-3);
+  width: min(92vw, calc((92vh - 64px) * 16 / 9));
+}
+
+@supports (height: 1svh) {
+  .film__frame {
+    width: min(92vw, calc((92svh - 64px) * 16 / 9));
+  }
+}
+
+.film__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  min-height: var(--tap);
+}
+
+.film__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px var(--s-3);
+  min-width: 0;
+}
+
+.film__title {
+  color: var(--bone-2);
+}
+
+.film__close {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  padding: 0;
+  border: 1px solid var(--line-3);
+  border-radius: 0;
+  background: rgba(15, 14, 13, 0.6);
+  color: var(--bone);
+  transition: border-color var(--d-2) var(--ease);
+}
+
+.film__close svg {
+  width: 16px;
+  height: 16px;
+}
+
+.film__close:hover {
+  border-color: var(--bone);
+}
+
+.film__close:focus-visible {
+  border-color: var(--bone);
+  outline: 2px solid var(--bone);
+  outline-offset: 3px;
+}
+
+.film__screen {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.film__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+.film__screen .film__corners {
+  inset: -7px;
+}
+
+@media (max-width: 599px) {
+  .film__title {
+    font-size: var(--t-mono-s);
+  }
+}
+
+/* open: the ground settles, the frame rises in (no motion: it simply appears) */
+@keyframes film-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes film-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0) scale(0.985);
+  }
+}
+
+html[data-motion="on"] .film[open]::backdrop {
+  animation: film-fade 280ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+html[data-motion="on"] .film[open] .film__frame {
+  animation: film-rise var(--d-3) var(--ease-out) both;
+}

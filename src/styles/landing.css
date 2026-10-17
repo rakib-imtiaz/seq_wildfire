@@ -1,0 +1,330 @@
+/* ---------- section 01 (the user's comp): statement over the photo, then four verb cards ---------- */
+
+.land {
+  position: relative;
+  padding-bottom: var(--s-8);
+  background: var(--ash-0);
+  overflow: hidden;
+}
+
+.land__band {
+  position: relative;
+  isolation: isolate;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+/* phones/tablets: the photo on top, fading into the copy */
+.land__media {
+  position: relative;
+  aspect-ratio: 5 / 4;
+}
+
+.land__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* drone (56 %) and guard (78 %) both in frame on a narrow crop */
+  object-position: 70% 40%;
+}
+
+.land__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(0deg, var(--ash-0) 2%, rgba(15, 14, 13, 0.55) 26%, rgba(15, 14, 13, 0) 48%);
+}
+
+.land__topo {
+  display: none;
+}
+
+.land__copy {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: var(--s-5);
+  margin-top: calc(var(--s-8) * -1);
+  padding-bottom: var(--s-7);
+}
+
+.land__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  color: var(--bone);
+  font-size: var(--t-mono-s);
+}
+
+.land__idx {
+  color: var(--ember);
+  font-weight: 700;
+  font-size: var(--t-mono);
+}
+
+.land__rule {
+  width: 32px;
+  height: 1px;
+  background: var(--line-3);
+}
+
+.land__title {
+  display: grid;
+  gap: var(--s-5);
+  margin-top: calc(var(--s-1) * -1);
+}
+
+.land__a {
+  font-size: clamp(1.875rem, 0.8rem + 2.3vw, 3.125rem);
+  line-height: 0.94;
+  color: var(--bone);
+}
+
+.land__b {
+  font-size: clamp(2.375rem, 0.9rem + 3.1vw, 4rem);
+  line-height: 0.95;
+  color: #b4afa8;
+}
+
+.land__b em {
+  font-style: normal;
+  color: var(--ember);
+}
+
+.land__lead {
+  max-width: 46ch;
+  color: var(--bone-2);
+  font-size: clamp(1rem, 0.95rem + 0.2vw, 1.0625rem);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.land__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-4) var(--s-5);
+  margin-top: var(--s-2);
+}
+
+.land__ghost {
+  border-color: var(--bone-2);
+  min-width: 172px;
+}
+
+/* ---------- the four cards ---------- */
+
+.land__cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--s-4);
+  row-gap: var(--s-7);
+  padding-top: var(--s-6);
+}
+
+.land__card {
+  display: grid;
+  grid-template-rows: auto auto auto auto 1fr;
+  align-content: start;
+  min-width: 0;
+}
+
+.land__n {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  color: var(--bone-2);
+}
+
+.land__dash {
+  width: 22px;
+  height: 2px;
+  background: var(--ember);
+}
+
+.land__verb {
+  margin-top: var(--s-3);
+  font-size: clamp(1.625rem, 1.2rem + 1.1vw, 2.25rem);
+  line-height: 1;
+}
+
+.land__note {
+  margin-top: var(--s-2);
+  color: var(--bone);
+  letter-spacing: 0.12em;
+}
+
+.land__img {
+  position: relative;
+  margin-top: var(--s-4);
+  aspect-ratio: 2 / 1;
+  overflow: hidden;
+  background: var(--ash-2);
+}
+
+.land__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.land__img::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 0 1px var(--line);
+  pointer-events: none;
+}
+
+/* the sample observation marker on the map card */
+.land__mark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 58%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  overflow: visible;
+  fill: none;
+  stroke: var(--ember);
+  stroke-width: 2.4;
+  vector-effect: non-scaling-stroke;
+}
+
+.land__mark circle {
+  fill: rgba(255, 106, 31, 0.35);
+}
+
+.land__foot {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: var(--s-3);
+  margin-top: var(--s-4);
+}
+
+.land__icon {
+  display: none;
+}
+
+.land__text {
+  color: var(--bone-2);
+  font-size: var(--t-small);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/* ---------- tablets ---------- */
+
+@media (min-width: 600px) {
+  .land__media {
+    aspect-ratio: 16 / 9;
+  }
+  .land__cards {
+    column-gap: var(--col-gap);
+  }
+  .land__foot {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: var(--s-4);
+  }
+  .land__icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border: 1.5px solid var(--ember);
+    border-radius: 50%;
+  }
+  .land__icon svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: var(--ember);
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+/* ---------- desktop: copy over the photo, four columns ---------- */
+
+@media (min-width: 1024px) {
+  .land__band {
+    display: flex;
+    align-items: center;
+    min-height: clamp(540px, 64vh, 640px);
+  }
+  .land__media {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: 62%;
+    aspect-ratio: auto;
+    z-index: -1;
+  }
+  .land__photo {
+    object-position: 50% 42%;
+  }
+  .land__media::after {
+    background:
+      linear-gradient(90deg, var(--ash-0) 0%, rgba(15, 14, 13, 0.86) 8%, rgba(15, 14, 13, 0.4) 20%, rgba(15, 14, 13, 0) 34%),
+      linear-gradient(0deg, rgba(15, 14, 13, 0.35) 0%, rgba(15, 14, 13, 0) 18%);
+  }
+  .land__topo {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 44%;
+    height: 100%;
+    z-index: -1;
+    fill: none;
+    stroke: var(--bone);
+    stroke-width: 1;
+    opacity: 0.06;
+    mask-image: linear-gradient(90deg, #000 30%, transparent 95%);
+    -webkit-mask-image: linear-gradient(90deg, #000 30%, transparent 95%);
+  }
+  .land__copy {
+    margin-top: 0;
+    padding-block: var(--s-8);
+  }
+  /* the title's lines are set by its breaks; the rest keeps to the dark side of the photo */
+  .land__copy > :not(.land__title) {
+    max-width: min(460px, 34vw);
+  }
+  .land__lead {
+    max-width: min(440px, 32vw);
+  }
+  .land__cards {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 0;
+    padding-top: var(--s-5);
+  }
+  .land__card {
+    padding: var(--s-3) var(--s-5) var(--s-2);
+  }
+  .land__card:first-child {
+    padding-left: 0;
+  }
+  .land__card:last-child {
+    padding-right: 0;
+  }
+  .land__card + .land__card {
+    border-left: 1px solid var(--line);
+  }
+}
+
+@media (min-width: 1280px) {
+  .land__media {
+    width: 68%;
+  }
+}
+
+@media (min-width: 1600px) {
+  .land__copy > :not(.land__title),
+  .land__lead {
+    max-width: 520px;
+  }
+}

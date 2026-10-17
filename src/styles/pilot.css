@@ -136,10 +136,6 @@
   border: 1px solid var(--line);
 }
 
-.chip:last-child {
-  grid-column: span 2;
-}
-
 .chip {
   display: grid;
   gap: 4px;

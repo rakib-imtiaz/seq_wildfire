@@ -1,7 +1,7 @@
 import { useRef, type ReactNode } from "react";
 import { SERVICES } from "../data/copy";
-import { MEDIA, PAIRS } from "../data/media";
-import { Arrow, Reticle, SampleTag, SectionLabel, Stamp, Ticker } from "../components/Motifs";
+import { MEDIA, PAIRS, type MediaSlot } from "../data/media";
+import { Arrow, Reticle, SampleTag, SectionLabel } from "../components/Motifs";
 import { PhotoSlot, ThermalPair } from "../components/Photo";
 import { ALL_LAYERS, SampleMap } from "../components/SampleMap";
 import { SceneArt } from "../components/SceneArt";
@@ -20,19 +20,24 @@ function LiveFeed() {
           <SampleTag>Sample feed</SampleTag>
         </div>
         <Reticle className="feed__reticle" />
-        <div className="feed__bottom mono mono--s">
-          <span>
-            <Ticker from="00:21:05" />
-          </span>
-          <span className="feed__modes">
-            <b>Thermal</b>
-            <span>Wide</span>
-            <span>Tele</span>
-          </span>
-          <span>Alt 120 m</span>
-        </div>
       </div>
     </PhotoSlot>
+  );
+}
+
+/** A report thumbnail: the canopy pair from row 2, framed on the stump (IMG 0412 in both places). */
+function ReportThumb({ media, mode }: { media: MediaSlot; mode: "visible" | "thermal" }) {
+  return (
+    <div className="svc-report__thumb">
+      {media.src ? (
+        <div className="svc-report__img">
+          <img src={media.src} srcSet={media.srcset} sizes="(min-width: 1024px) 480px, 70vw" alt="" loading="lazy" decoding="async" />
+        </div>
+      ) : (
+        <SceneArt kind="canopy" mode={mode} ratio={[1, 1]} seed={8} />
+      )}
+      <span className="mono mono--s">IMG 0412 &middot; {mode === "visible" ? "Visible" : "Thermal"}</span>
+    </div>
   );
 }
 
@@ -44,14 +49,8 @@ function ReportCard() {
         <SampleTag />
       </div>
       <div className="svc-report__thumbs" aria-hidden="true">
-        <div className="svc-report__thumb">
-          <SceneArt kind="canopy" mode="visible" ratio={[1, 1]} seed={8} />
-          <span className="mono mono--s">IMG 0412 &middot; Visible</span>
-        </div>
-        <div className="svc-report__thumb">
-          <SceneArt kind="canopy" mode="thermal" ratio={[1, 1]} seed={8} />
-          <span className="mono mono--s">IMG 0412 &middot; Thermal</span>
-        </div>
+        <ReportThumb media={PAIRS.svcCanopy.visible} mode="visible" />
+        <ReportThumb media={PAIRS.svcCanopy.thermal} mode="thermal" />
       </div>
       <dl className="report__rows mono mono--s">
         <div>
@@ -63,14 +62,6 @@ function ReportCard() {
           <dd>1 hotspot &middot; 312 &deg;C</dd>
         </div>
         <div>
-          <dt>Geotagged imagery</dt>
-          <dd>E +0395 N +0385</dd>
-        </div>
-        <div>
-          <dt>Timestamps</dt>
-          <dd>19:42 to 20:12</dd>
-        </div>
-        <div>
           <dt>Follow-up</dt>
           <dd>Additional monitoring</dd>
         </div>
@@ -79,19 +70,20 @@ function ReportCard() {
   );
 }
 
+/** The brief's first sentence for each service: the rest is detail the page doesn't need. */
+const firstSentence = (t: string) => t.match(/^.*?\.(?=\s|$)/)?.[0] ?? t;
+
 const VISUALS: (() => ReactNode)[] = [
-  () => <PhotoSlot media={MEDIA.svcPatrol} kind="patrol" ratio={[4, 3]} seed={17} origin={["84%", "83%"]} />,
+  () => <PhotoSlot media={MEDIA.svcPatrol} kind="patrol" ratio={[4, 3]} seed={17} origin={["26%", "63%"]} />,
   () => (
     <div className="svc-pair">
-      <ThermalPair pair={PAIRS.svcCanopy} kind="canopy" ratio={[4, 3]} seed={8} rest={[0.56, 0.46]} label="Thermal lens" />
-      <Stamp items={["IMG 0412", "Iron Red palette", "640×512"]} />
+      <ThermalPair pair={PAIRS.svcCanopy} kind="canopy" ratio={[4, 3]} seed={8} rest={[0.67, 0.28]} label="Thermal lens" sizes="(min-width: 1024px) 46vw, 100vw" />
     </div>
   ),
   () => (
     <div className="svc-map">
       <SampleMap layers={ALL_LAYERS} time={2} labels={false} title="Sample map still: all six layers" />
       <div className="svc-map__foot">
-        <Stamp items={["6 layers", "3 sample times"]} />
         <a href="#mapping" className="textlink mono mono--s">
           <span>Try the sample map</span>
           <Arrow />
@@ -122,8 +114,7 @@ export function Services() {
               <div className="svc__copy" data-reveal>
                 <p className="svc__n mono">{s.n}</p>
                 <h3 className="h3 svc__title">{s.title}</h3>
-                <p className="body">{s.text}</p>
-                {"more" in s && s.more && <p className="body svc__more">{s.more}</p>}
+                <p className="body">{firstSentence(s.text)}</p>
               </div>
               <div className="svc__vis">{VISUALS[i]()}</div>
             </li>

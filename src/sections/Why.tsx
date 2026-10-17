@@ -16,9 +16,6 @@ export function Why() {
             <h2 id="why-title" className="h2" data-reveal>
               {WHY.title}
             </h2>
-            <p className="lead" data-reveal style={{ ["--i" as string]: 1 }}>
-              {WHY.intro}
-            </p>
           </div>
           <ul className="why__list">
             {WHY.items.map((it, i) => (
@@ -34,11 +31,6 @@ export function Why() {
         </div>
 
         <div className="why__key" data-reveal>
-          <p className="mono mono--s why__key-label">
-            <span className="label__idx">06</span>
-            <span className="label__rule" aria-hidden="true" />
-            <span className="smoke">The difference</span>
-          </p>
           <p className="why__key-text display">{WHY.key}</p>
         </div>
       </div>

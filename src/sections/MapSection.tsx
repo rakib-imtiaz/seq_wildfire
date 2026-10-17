@@ -90,9 +90,6 @@ export function MapSection() {
           <h2 id="map-title" className="h2" data-reveal>
             {MAPPING.title}
           </h2>
-          <p className="lead" data-reveal style={{ ["--i" as string]: 1 }}>
-            {MAPPING.intro}
-          </p>
         </div>
 
         <div className="mapsec__ws">
@@ -113,7 +110,6 @@ export function MapSection() {
                 <i style={{ width: `${(200 / (phone ? 1240 : 1600)) * 100}%` }} />
               </div>
             </div>
-            <p className="mapsec__note body">{MAPPING.note}</p>
           </div>
 
           <div className="mapsec__panel">
@@ -133,7 +129,6 @@ export function MapSection() {
                       </span>
                       <span className="layer__txt">
                         <span className="layer__name">{l.label}</span>
-                        <span className="layer__brief">{l.brief}</span>
                       </span>
                       <span className="layer__state" aria-hidden="true" />
                     </button>

@@ -17,6 +17,11 @@
   z-index: -2;
 }
 
+/* the lamp-lit kit sits right of centre; keep it in frame on narrow screens */
+.prop__photo > img {
+  object-position: 72% 40%;
+}
+
 .prop__scrim {
   position: absolute;
   inset: 0;

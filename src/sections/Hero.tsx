@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState, type PointerEvent as RPointerEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type PointerEvent as RPointerEvent, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { CTA_SHORT, HERO } from "../data/copy";
-import { Arrow, Stamp, Ticker } from "../components/Motifs";
+import { Arrow } from "../components/Motifs";
 import { clamp, motionOn } from "../lib/motion";
 import { mountTableInto, safe, TABLE_STILLS, type HeroStillData, type HeroVariant, type Insets, type LensReadout, type TableHandle } from "../lib/table3d";
 import { useZone } from "../lib/zone";
@@ -41,7 +41,11 @@ function coverMap(W: number, H: number, iw: number, ih: number) {
 
 const fmtGrid = (v: number) => (v < 0 ? "−" : "+") + String(Math.abs(Math.round(v))).padStart(4, "0");
 
-export function Hero() {
+/**
+ * The 3D command-table hero. Optional slots for the hero review variants (?hero=2 / ?hero=3):
+ * `backdrop` renders behind the stage, `actions` after the CTAs, `className` on the section.
+ */
+export function Hero({ backdrop, actions, className = "" }: { backdrop?: ReactNode; actions?: ReactNode; className?: string } = {}) {
   const zone = useZone();
   const stageRef = useRef<HTMLDivElement>(null);
   const slot3dRef = useRef<HTMLDivElement>(null);
@@ -342,7 +346,8 @@ export function Hero() {
   };
 
   return (
-    <section className="hero" aria-labelledby="hero-title">
+    <section className={`hero ${className}`.trim()} aria-labelledby="hero-title">
+      {backdrop}
       <div
         ref={stageRef}
         className="hero__stage"
@@ -374,19 +379,12 @@ export function Hero() {
             <span className="lens__max">
               Max <b ref={maxRef}>---.-</b> &deg;C
             </span>
-            <span>
-              E <span ref={eRef}>+0000</span> &nbsp;N <span ref={nRef}>+0000</span>
-            </span>
             <span className="sample">Sample zone</span>
           </span>
         </div>
       </div>
 
       <div className="hero__copy wrap">
-        <p className="hero__eyebrow mono" data-reveal>
-          <span className="hero__eyebrow-rule" aria-hidden="true" />
-          {HERO.eyebrow}
-        </p>
         <h1 id="hero-title" className="hero__title display" data-reveal style={{ ["--i" as string]: 1 }}>
           <span className="hero__t1">
             {HERO.title[0]} <br />
@@ -398,9 +396,6 @@ export function Hero() {
             {HERO.title[3]}
           </span>
         </h1>
-        <p className="hero__lead lead" data-reveal style={{ ["--i" as string]: 2 }}>
-          {HERO.lead}
-        </p>
         <div className="hero__ctas" data-reveal style={{ ["--i" as string]: 3 }}>
           <Link to="/proposal" className="btn btn--ember btn--lg">
             {CTA_SHORT}
@@ -409,20 +404,12 @@ export function Hero() {
           <a href="#how" className="btn btn--ghost btn--lg">
             How it works
           </a>
+          {actions}
         </div>
       </div>
 
       <div className="hero__strip">
         <div className="wrap hero__strip-in">
-          <Stamp
-            className="hero__stamp"
-            items={[
-              zone?.name ?? "Sample watch zone 07",
-              <Ticker key="t" from="00:14:32" />,
-              <span key="s" className="hide-s">M3T thermal 640&times;512</span>,
-              <span key="g" className="hide-m">Low gain 0 to 500 &deg;C</span>,
-            ]}
-          />
           <p className="hero__hint mono mono--s smoke">
             <span className="hint-fine">Move across the table</span>
             <span className="hint-touch">Drag across the table</span>: thermal lens

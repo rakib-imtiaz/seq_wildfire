@@ -1,9 +1,14 @@
 # Sequoia Wildfire: photos still needed
 
-Updated 2026-10-16. This file lists only what's still missing.
-- The 5 application pairs are already in.
-- The 3D, stills, map and report are rendered from our own scene.
-- Model reference sheets and look-dev frames are no longer needed.
+**Status 2026-10-17:** all 10 photos below arrived (zip `wildfire_drone_website_images.zip`) and are on the site, except one:
+
+- **`standards-preflight.png` (#7) needs a re-send.** The copy in the zip was cut off after the top 40% (1.2 MB, bottom 60% missing). The site shows a 2:1 crop of the intact top until a full copy arrives. When it does, drop it in `media/incoming/`; I switch the slot back to 3:2.
+
+Everything else is done:
+- the 5 application pairs
+- the 3D, stills, map and report, which are rendered from our own scene
+
+Model reference sheets and look-dev frames are no longer needed.
 
 **Where they go:** drop the files into `seq_wildfire/media/incoming/` under these exact names. I convert them to webp.
 

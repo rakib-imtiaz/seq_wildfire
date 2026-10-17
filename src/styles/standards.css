@@ -77,6 +77,11 @@
   z-index: -2;
 }
 
+/* keep the smoke column in frame when a narrow or very wide band crops the 21:9 photo */
+.cta__photo > img {
+  object-position: 64% 30%;
+}
+
 .cta__scrim {
   position: absolute;
   inset: 0;

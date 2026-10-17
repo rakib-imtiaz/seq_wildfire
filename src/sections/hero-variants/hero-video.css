@@ -1,0 +1,110 @@
+/*
+ * Hero variant 1 (?hero=1): full-bleed aerial footage in place of the 3D table; the thermal lens rides over it.
+ * Layout, copy and lens styling come from hero.css (same classes); everything here is scoped to .hero--video.
+ */
+
+.hero.hero--video {
+  background: var(--ash-0);
+}
+
+/* the 3D hero's left scrim is replaced by the footage scrim below */
+.hero.hero--video::before {
+  content: none;
+}
+
+.hero--video .hero__stage {
+  overflow: hidden;
+  background: var(--ash-1);
+}
+
+.hero--video .hero-video__poster,
+.hero--video .hero-video__clip {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* phones and tablets: shifted (from JS) so the smoke base sits mid-stage */
+  object-position: var(--vpos, 50% 50%);
+}
+
+.hero--video .hero-video__poster {
+  opacity: 0;
+  transition: opacity 0.9s var(--ease);
+}
+
+.hero--video .hero__stage[data-drawn] .hero-video__poster {
+  opacity: 1;
+}
+
+/* the clip fades in over its own first frame (the poster), so the hand-over is invisible */
+.hero--video .hero-video__clip {
+  opacity: 0;
+  transition: opacity 0.6s var(--ease);
+}
+
+.hero--video .hero-video__clip[data-on] {
+  opacity: 1;
+}
+
+/* the optional real thermal clip is only a texture source for the lens */
+.hero--video .hero-video__thermal {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2px;
+  height: 2px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* scrim, phones and tablets: the stage sits above the copy, so the footage just settles into the ash below it */
+.hero--video .hero-video__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(0deg, var(--ash-0) 0%, rgba(15, 14, 13, 0.55) 14%, rgba(15, 14, 13, 0) 38%),
+    linear-gradient(180deg, rgba(15, 14, 13, 0.25) 0%, rgba(15, 14, 13, 0) 20%);
+}
+
+/* the thermal fill: a WebGL canvas the size of the ring, moved with it (transparent outside the circle) */
+.hero--video .hero-video__gl {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  transform: translate(calc(var(--lx) - var(--lr) - 2px), calc(var(--ly) - var(--lr) - 2px));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--d-3) var(--ease);
+}
+
+.hero--video .hero__stage[data-drawn][data-gl] .hero-video__gl {
+  opacity: 1;
+}
+
+/* a soft dark halo separates the ring from bright footage */
+.hero--video .lens__ring {
+  box-shadow:
+    0 0 0 1px rgba(15, 14, 13, 0.45),
+    0 0 28px rgba(15, 14, 13, 0.35);
+}
+
+/* ---------- desktop: footage fills the hero, copy bottom-left over a left + bottom scrim ---------- */
+
+/*
+ * Measured on the clip's frames at 1024x768 to 2560x1440 (worst pixel behind each text box): lead >= 6.2:1,
+ * eyebrow >= 6.6:1, CTAs >= 9.9:1, the dim title lines (large text) >= 3.2:1. The pool darkens the bright valley
+ * and river behind the title; the smoke and lens area stays nearly clear.
+ */
+@media (min-width: 1024px) {
+  .hero--video .hero-video__scrim {
+    background:
+      radial-gradient(40% 36% at 20% 36%, rgba(15, 14, 13, 0.55), rgba(15, 14, 13, 0)),
+      linear-gradient(90deg, rgba(15, 14, 13, 0.88) 0%, rgba(15, 14, 13, 0.78) 24%, rgba(15, 14, 13, 0.5) 44%, rgba(15, 14, 13, 0.1) 60%, rgba(15, 14, 13, 0) 66%),
+      linear-gradient(0deg, rgba(15, 14, 13, 0.9) 0%, rgba(15, 14, 13, 0.52) 18%, rgba(15, 14, 13, 0) 44%),
+      linear-gradient(180deg, rgba(15, 14, 13, 0.6) 0%, rgba(15, 14, 13, 0) 20%);
+  }
+}
