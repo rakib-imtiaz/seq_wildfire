@@ -5,6 +5,7 @@ import { CONTACT, CTA, FOOTNOTE, NAV } from "../data/copy";
 import { Icon } from "../components/Icon";
 import { Wordmark } from "../../components/Logo";
 import { BrandMark } from "../components/BrandMark";
+import { FooterTopo } from "../components/FooterTopo";
 import { motionOn } from "../lib/page";
 
 gsap.registerPlugin(ScrollToPlugin);
@@ -127,9 +128,11 @@ export function Header() {
   );
 }
 
+/** the user's footer comp (10-21): ember accents on near-black, three ruled columns, a live topographic corner */
 export function Footer() {
   return (
     <footer className="ftr">
+      <FooterTopo />
       <div className="ftr__in">
         <div className="ftr__top">
           <div className="ftr__brand">
@@ -137,10 +140,13 @@ export function Footer() {
             <p className="ftr__desc">Wildfire monitoring &amp; fire watch</p>
           </div>
           <a className="ftr__cta" href={CTA.href}>
-            {CTA.label}
-            <Icon name="next" size={22} />
+            <span>{CTA.label}</span>
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+              <path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="1.6" />
+            </svg>
           </a>
         </div>
+        <div className="ftr__rule" aria-hidden="true" />
         <div className="ftr__cols">
           <nav className="ftr__col" aria-label="Footer">
             <p className="ftr__k">Site</p>
@@ -152,24 +158,39 @@ export function Footer() {
           </nav>
           <div className="ftr__col">
             <p className="ftr__k">Contact</p>
-            <address>
-              {CONTACT.address.map((l) => (
-                <span key={l}>{l}</span>
-              ))}
+            <address className="ftr__line">
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" className="ftr__ic">
+                <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" />
+                <circle cx="12" cy="10" r="2.4" />
+              </svg>
+              <span>
+                {CONTACT.address.map((l) => (
+                  <span key={l} className="ftr__addr-l">
+                    {l}
+                  </span>
+                ))}
+              </span>
             </address>
-            <a href={CONTACT.tel}>{CONTACT.phone}</a>
+            <a className="ftr__line" href={CONTACT.tel}>
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" className="ftr__ic">
+                <path d="M5 4h3.2l1.6 4-2.1 1.3a11 11 0 0 0 5 5l1.3-2.1 4 1.6V17a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z" />
+              </svg>
+              <span>{CONTACT.phone}</span>
+            </a>
           </div>
           <div className="ftr__col">
             <p className="ftr__k">Sequoia Security</p>
             <a href={CONTACT.guarding.href} rel="noopener">
               Guarding services
-              <Icon name="out" size={15} />
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" className="ftr__out">
+                <path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" strokeWidth="1.6" />
+              </svg>
             </a>
           </div>
         </div>
         <div className="ftr__base">
           <p>{FOOTNOTE}</p>
-          <p>© {new Date().getFullYear()} Sequoia Security</p>
+          <p className="ftr__copy">© {new Date().getFullYear()} Sequoia Security</p>
         </div>
       </div>
     </footer>
