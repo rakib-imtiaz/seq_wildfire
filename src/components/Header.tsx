@@ -6,7 +6,8 @@ import { Arrow } from "./Motifs";
 
 export function Header() {
   const { pathname } = useLocation();
-  const isHome = pathname === "/";
+  // this app serves the earlier design at /v1/ and the proposal form; the main page (/) is v3
+  const isHome = pathname === "/v1" || pathname === "/v1/";
   const [solid, setSolid] = useState(false);
   const [open, setOpen] = useState(false);
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -61,15 +62,17 @@ export function Header() {
     };
   }, [open]);
 
-  const navHref = (h: string) => (isHome ? h : `/${h}`);
+  // off its own home, the nav points at the main page's sections
+  const MAIN: Record<string, string> = { "#how": "/#story", "#services": "/#services", "#applications": "/#applications", "#standards": "/#why" };
+  const navHref = (h: string) => (isHome ? h : MAIN[h] ?? "/");
 
   return (
     <>
       <header className="hdr" data-solid={solid || open || !isHome ? "" : undefined} data-open={open ? "" : undefined}>
         <div className="hdr__in wrap">
-          <Link to="/" className="hdr__logo" aria-label="Sequoia Security wildfire monitoring, home">
+          <a href="/" className="hdr__logo" aria-label="Sequoia Security wildfire monitoring, home">
             <Logo />
-          </Link>
+          </a>
 
           <nav className="hdr__nav" aria-label="Primary">
             <ul>

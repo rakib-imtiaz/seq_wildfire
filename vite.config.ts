@@ -115,8 +115,25 @@ function tableStillsDevApi(): Plugin {
   };
 }
 
-export default defineConfig({
-  plugins: [react(), hoistImportMap(), proposalDevApi(), tableStillsDevApi()],
-  server: { port: 5210, strictPort: true },
-  preview: { port: 5210, strictPort: true },
+export default defineConfig(async () => {
+  // Pages: the main page (v3 "Maquette") at /, the proposal form at /proposal (proposal.html, the v1 app's
+  // /proposal route), the earlier v1 design at /v1/ (noindex). Entry paths are resolved from this file's folder.
+  // node:path / node:url through a dynamic import: @types/node is not installed in this project
+  const path = (await import("node:" + "path")) as unknown as { dirname(p: string): string; resolve(...p: string[]): string };
+  const url = (await import("node:" + "url")) as unknown as { fileURLToPath(u: string): string };
+  const here = path.dirname(url.fileURLToPath((import.meta as unknown as { url: string }).url));
+  return {
+    plugins: [react(), hoistImportMap(), proposalDevApi(), tableStillsDevApi()],
+    server: { port: 5210, strictPort: true },
+    preview: { port: 5210, strictPort: true },
+    build: {
+      rollupOptions: {
+        input: {
+          main: path.resolve(here, "index.html"),
+          proposal: path.resolve(here, "proposal.html"),
+          v1: path.resolve(here, "v1/index.html"),
+        },
+      },
+    },
+  };
 });

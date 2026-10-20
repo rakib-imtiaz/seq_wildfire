@@ -1,5 +1,4 @@
 import { useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
-import { Link } from "react-router-dom";
 import { APPLICATIONS, BUSINESS, CTA_LONG, META, SIGNOFF } from "../data/copy";
 import { MEDIA } from "../data/media";
 import { Arrow, SampleTag, Stamp } from "../components/Motifs";
@@ -244,9 +243,9 @@ export default function Proposal() {
               .
             </p>
             <div className="prop__done-actions">
-              <Link to="/" className="btn btn--ghost btn--lg">
+              <a href="/" className="btn btn--ghost btn--lg">
                 Back to the site
-              </Link>
+              </a>
               <button type="button" className="btn btn--ghost btn--lg" onClick={reset}>
                 Send another request
               </button>

@@ -3,3 +3,8 @@ dist
 .env*
 .vercel
 review/*.png
+
+# private working notes (local only, not for the public repo)
+CLAUDE.md
+PROJECT_CONTEXT.md
+docs/history/

@@ -125,3 +125,17 @@ The brief says "Transport Canada Advanced Operations" pilot certificate. State i
 5. **No em dashes in site copy.**
 6. No DJI or Transport Canada logos. The model name and certificate name as plain text only.
 7. The guarding services (patrol, alarms and so on) live on sequoiasecurity.ca. This site only links there.
+
+## 6. Careers (the client's recruiting post, sent by the user 2026-10-21)
+
+Source: "WE'RE RECRUITING | SECURITY GUARDS + DRONE PILOTS" (the user's PDF, `Downloads/Document (2).PDF`). Apply email from the user: **career@sequoiaservices.ca**. Emojis and hashtags dropped; the post said "send us a direct message", the site says to email the address above.
+
+- Sequoia Security | British Columbia. "No drone experience? No problem. We'll provide the training!"
+- "We're building a new generation of fire watch security teams, combining traditional security services with advanced drone technology, thermal imaging, and wildfire monitoring."
+- "We're looking for motivated Security Guards interested in expanding their careers into professional drone operations."
+- **What you'll be doing:** conduct fire watch and security patrols at critical infrastructure sites; operate thermal-equipped DJI Mavic 3T drones after certification and authorization; monitor designated areas for potential fire hazards and hotspots; assist with aerial inspections, wildfire mapping, and incident documentation; work as part of a technology-driven security team.
+- **What we offer:** training toward Transport Canada Advanced Drone Pilot Certification; hands-on training with enterprise drones and thermal cameras; experience with aerial mapping and wildfire monitoring technology; opportunity to develop valuable skills in a growing industry; potential seasonal and project-based employment opportunities.
+- **Who we're looking for:** valid BC Security Worker Licence; no previous drone experience required; comfortable working outdoors and at remote locations; strong communication skills and attention to safety; willingness to complete drone training and certification requirements; previous fire watch or industrial security experience is an asset.
+- Location: British Columbia. Positions: Seasonal / Project-Based. Drone training: Provided. Recruitment: for anticipated upcoming projects; deployments are subject to contract awards.
+- "Send us a direct message with your resume and a brief introduction."
+- "We're not just recruiting security guards. We're developing the next generation of technology-enabled fire watch professionals."

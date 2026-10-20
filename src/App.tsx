@@ -38,7 +38,7 @@ export default function App() {
       <main id="main" tabIndex={-1}>
         <Suspense fallback={<div className="route-fallback" />}>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/v1" element={<Home />} />
             <Route path="/proposal" element={<Proposal />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

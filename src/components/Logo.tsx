@@ -1,4 +1,5 @@
 import { useId } from "react";
+import type React from "react";
 
 /**
  * Sequoia Security wordmark, rebuilt from the client's business card (references/Sequoia Security Anik.jpg):
@@ -77,11 +78,12 @@ export function Wordmark({ className, title = "Sequoia Security" }: { className?
       </defs>
       <g clipPath={`url(#cap-${id})`}>
         {LAYOUT.items.map(({ g, x }, i) => (
-          <g key={i} transform={`translate(${x} 0)`}>
+          <g key={i} transform={`translate(${x} 0)`} style={{ ["--i" as string]: i } as React.CSSProperties}>
             {g.rects?.map(([rx, ry, rw, rh], k) => <rect key={k} x={rx} y={ry} width={rw} height={rh} fill="currentColor" />)}
             {g.d && (
               <path
                 d={g.d}
+                pathLength={1}
                 fill="none"
                 stroke="currentColor"
                 strokeWidth={SW}

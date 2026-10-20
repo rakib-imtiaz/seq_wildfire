@@ -16,9 +16,9 @@ export default function NotFound() {
         </h1>
         <p className="lead">This page is outside the watch zone. It may have moved, or the address may be mistyped.</p>
         <div className="nf__actions">
-          <Link to="/" className="btn btn--ghost btn--lg">
+          <a href="/" className="btn btn--ghost btn--lg">
             Back to the site
-          </Link>
+          </a>
           <Link to="/proposal" className="btn btn--ember btn--lg">
             {CTA_SHORT}
             <Arrow />
