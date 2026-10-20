@@ -380,13 +380,30 @@ html[data-motion="on"] .ftopo__lit { animation: ftopo-glow 4s ease-in-out infini
 @keyframes ftopo-run { to { stroke-dashoffset: -1; } }
 @keyframes ftopo-glow { from { stroke: rgba(232, 120, 44, 0.4); } to { stroke: rgba(232, 120, 44, 0.75); } }
 
+/* phones: a compact stack; the glow tucked into the corner, the hill pinned to the bottom corner */
 @media (max-width: 899px) {
-  .ftr__cta { width: 100%; justify-content: space-between; }
-  .ftr__cols { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .ftr {
+    padding: 44px 0 26px;
+    background:
+      radial-gradient(70% 22% at 100% 0%, rgba(232, 120, 44, 0.16), rgba(232, 120, 44, 0) 75%),
+      linear-gradient(180deg, #19191c 0%, #141416 100%);
+  }
+  .ftr__top { gap: 22px; }
+  .ftr__desc { font-size: 10.5px; letter-spacing: 0.24em; }
+  .ftr__cta { width: 100%; min-height: 54px; justify-content: space-between; letter-spacing: 0.12em; }
+  .ftr__rule { margin-top: 26px; }
+  .ftr__cols { grid-template-columns: minmax(0, 1fr); gap: 22px; padding: 26px 0 28px; }
   .ftr__col { padding: 0; border-left: 0; }
-  .ftr__col + .ftr__col { padding-top: 26px; border-top: 1px solid rgba(233, 234, 231, 0.12); }
+  .ftr__col + .ftr__col { padding-top: 22px; border-top: 1px solid rgba(233, 234, 231, 0.12); }
+  .ftr__k { margin-bottom: 8px; font-size: 11px; }
+  .ftr__col:first-child { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 16px; }
+  .ftr__col:first-child .ftr__k { grid-column: 1 / -1; }
+  .ftr__col a, .ftr__line { min-height: 40px; font-size: 16px; }
+  .ftr__line { gap: 14px; }
+  .ftr__line + .ftr__line { margin-top: 6px; }
+  .ftr__base { padding-top: 20px; font-size: 13px; gap: 8px; }
   .ftr__copy { padding-left: 0; border-left: 0; }
-  .ftopo { width: 140vw; opacity: 0.8; }
+  .ftopo { top: auto; width: 100%; height: 360px; opacity: 0.85; }
 }
 
 /* reveals: the block is observed, only its children move */
