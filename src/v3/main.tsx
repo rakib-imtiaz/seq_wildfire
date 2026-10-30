@@ -5,6 +5,7 @@ import { initPage } from "./lib/page";
 import "./styles/base.css";
 import "./styles/story.css";
 import "./styles/sections.css";
+import "./styles/mobile.css";
 
 initPage();
 

@@ -23,6 +23,8 @@ export const QA = {
   beat: num("beat", 0, 6),
   frame: num("frame", 0, 6),
   lens: (["wide", "tele", "thermal"] as const).find((l) => l === params.get("lens")) ?? null,
+  // ?layout=3d: the earlier desktop layout (sections/Classic), kept for review
+  classic: params.get("layout") === "3d",
 };
 
 export type Quality = "lite" | "balanced" | "high";

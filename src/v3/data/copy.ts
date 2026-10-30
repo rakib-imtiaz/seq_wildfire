@@ -21,6 +21,8 @@ export const NAV = [
   { href: "#services", id: "services", label: "Services" },
   { href: "#applications", id: "applications", label: "Applications" },
   { href: "#why", id: "why", label: "Why Sequoia" },
+  // desktop card page only (sections/Model); the header lists only the sections the page has
+  { href: "#model", id: "model", label: "3D Model" },
   { href: "#careers", id: "careers", label: "Careers" },
 ] as const;
 
@@ -199,17 +201,54 @@ export const OBSERVATIONS = [
 
 export const SAMPLE_NOTE = "SAMPLE data, fictional watch zone";
 
-/** brief, Service 5: "flight records, thermal observations, geotagged imagery, incident locations, timestamps, and
- * follow-up recommendations"; step 5's two audiences. All values are SAMPLE. */
-export const REPORT = {
-  title: "Incident report",
-  zone: "Watch zone 07, fictional",
-  rows: [
-    { k: "Flight", v: "M3T, 20:11 to 20:26" },
-    { k: "Thermal", v: "312 °C spot reading" },
-    { k: "Location", v: "E 395 N 250" },
-  ],
+/**
+ * The film (2026-10-27): the user's AI-generated film of the proposed service, re-cut for the web (tools/film-cut.py,
+ * notes in src/v3/README.md). It is not real footage, so it always carries the "Illustrative footage" note. It opens
+ * full screen from the hero's "Watch the film" (components/FilmModal), muted by default.
+ */
+export const FILM = {
+  title: "From the ground and the sky",
+  note: "Illustrative footage",
+  src: "/media/video/film-1080.mp4",
+  poster: "/media/video/film-poster.webp",
 } as const;
+
+/** desktop hero (sections/DeskHero): chapter 01 as a loop from the film; the 3D story below carries on from 02 */
+export const DESK_HERO = {
+  kicker: "Drone-enhanced fire watch",
+  watch: "Watch the film",
+  src: "/media/video/d-hero.mp4",
+  poster: "/media/video/d-hero.webp",
+} as const;
+
+/**
+ * Phones (2026-10-27, the user's second comp): seven tall edge-to-edge cards, each a number, a title, one line and an
+ * arrow over or beside footage from the film. The layout follows the comp; the copy comes from FACTS. The comp's
+ * "AI detects", "real time", "Safer Sites. Smarter Decisions." and "next-generation" lines aren't in the brief, so
+ * they're replaced. `t` is where that part starts in film-1080.mp4.
+ */
+export const MOBILE = {
+  watch: "Watch video",
+  cards: [
+    { id: "lenses", beat: "lenses", nav: "services", title: "Three Lenses.", title2: "A Clearer View.", line: "Wide, tele and thermal cameras in one gimbal.", t: 99.58 },
+    { id: "heat", beat: "heat", nav: null, title: "Spot Heat From Above", line: "Thermal imaging to help identify potential hotspots.", t: 124.26 },
+    { id: "team", beat: "team", nav: null, title: "Ground and Sky,", title2: "One Team", line: "Every fire watch guard will also be a certified drone pilot.", t: 59.75 },
+    { id: "map", beat: "map", nav: "applications", title: "Every Observation,", title2: "One Map", line: "Hotspots, patrols and drone observations, geotagged.", t: 154.13 },
+    { id: "site", beat: null, nav: "why", title: "From the Ground and the Sky", line: "Ground patrols and aerial thermal inspection, one integrated team.", t: 191.01 },
+  ],
+  close: { title: "Request a Proposal", line: "Tell us about your site. We'll prepare a wildfire monitoring proposal." },
+  careers: { title: "We're Recruiting", line: "Security guards and drone pilots. No drone experience needed.", details: "See the role" },
+  watchPart: "Watch this part",
+  close_: "Close",
+  more: "More about this",
+  footer: [
+    { href: "#story", label: "How it works" },
+    { href: "#careers", label: "Careers" },
+  ],
+  guarding: "Guarding services",
+  sample: "SAMPLE",
+} as const;
+
 
 /** brief, Our Core Services (titles verbatim, one line each, cut) */
 export const SERVICES = [

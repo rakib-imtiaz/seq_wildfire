@@ -162,6 +162,22 @@ html { scrollbar-color: rgba(26, 28, 30, 0.38) var(--ground); scrollbar-width: t
   background: rgba(226, 227, 224, 0.94);
   border-bottom: 1px solid var(--line-2);
 }
+/* phones: see-through over the mobile hero (MobilePage sets html[data-hdr="over"] while the hero is under the header) */
+.hdr { transition: background-color 300ms ease, border-color 300ms ease; }
+html[data-hdr="over"] .hdr:not([data-open]) { background: transparent; border-bottom-color: transparent; }
+html[data-hdr="over"] .hdr:not([data-open]) .hdr__brand { color: #fff; }
+html[data-hdr="over"] .hdr:not([data-open]) .logo__desc { color: rgba(255, 255, 255, 0.7); }
+html[data-hdr="over"] .hdr:not([data-open]) .brand__scan { mix-blend-mode: normal; }
+html[data-hdr="over"] .hdr:not([data-open]) .hdr__link { color: rgba(255, 255, 255, 0.9); }
+html[data-hdr="over"] .hdr:not([data-open]) .hdr__link:hover { color: #fff; }
+html[data-hdr="over"] .hdr:not([data-open]) .hdr__link::after { background: #fff; }
+html[data-hdr="over"] .hdr:not([data-open]) .hdr__menu {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(18, 20, 22, 0.16);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
 /* sections, in condensed caps; the one in view underlined in cobalt */
 .hdr__nav { display: flex; align-items: center; gap: clamp(14px, 2vw, 34px); margin-left: auto; margin-right: clamp(10px, 2vw, 28px); }
 .hdr__link {
@@ -380,30 +396,29 @@ html[data-motion="on"] .ftopo__lit { animation: ftopo-glow 4s ease-in-out infini
 @keyframes ftopo-run { to { stroke-dashoffset: -1; } }
 @keyframes ftopo-glow { from { stroke: rgba(232, 120, 44, 0.4); } to { stroke: rgba(232, 120, 44, 0.75); } }
 
-/* phones: a compact stack; the glow tucked into the corner, the hill pinned to the bottom corner */
+/* phones: only what is useful at the end of a phone page. The header already carries the wordmark and its Menu the
+   sections, so the footer is the proposal button, the contact, guarding services and the note, over the live hill */
 @media (max-width: 899px) {
   .ftr {
-    padding: 44px 0 26px;
+    padding: 36px 0 24px;
     background:
-      radial-gradient(70% 22% at 100% 0%, rgba(232, 120, 44, 0.16), rgba(232, 120, 44, 0) 75%),
+      radial-gradient(80% 30% at 100% 0%, rgba(232, 120, 44, 0.14), rgba(232, 120, 44, 0) 75%),
       linear-gradient(180deg, #19191c 0%, #141416 100%);
   }
-  .ftr__top { gap: 22px; }
-  .ftr__desc { font-size: 10.5px; letter-spacing: 0.24em; }
+  .ftr__brand, .ftr__col:first-child { display: none; }
   .ftr__cta { width: 100%; min-height: 54px; justify-content: space-between; letter-spacing: 0.12em; }
-  .ftr__rule { margin-top: 26px; }
-  .ftr__cols { grid-template-columns: minmax(0, 1fr); gap: 22px; padding: 26px 0 28px; }
+  .ftr__rule { margin-top: 24px; }
+  .ftr__cols { grid-template-columns: minmax(0, 1fr); gap: 18px; padding: 22px 0 24px; }
   .ftr__col { padding: 0; border-left: 0; }
-  .ftr__col + .ftr__col { padding-top: 22px; border-top: 1px solid rgba(233, 234, 231, 0.12); }
-  .ftr__k { margin-bottom: 8px; font-size: 11px; }
-  .ftr__col:first-child { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 16px; }
-  .ftr__col:first-child .ftr__k { grid-column: 1 / -1; }
+  .ftr__col:first-child + .ftr__col { padding-top: 0; border-top: 0; }
+  .ftr__col + .ftr__col { padding-top: 18px; border-top: 1px solid rgba(233, 234, 231, 0.12); }
+  .ftr__k { margin-bottom: 6px; font-size: 11px; }
   .ftr__col a, .ftr__line { min-height: 40px; font-size: 16px; }
   .ftr__line { gap: 14px; }
-  .ftr__line + .ftr__line { margin-top: 6px; }
-  .ftr__base { padding-top: 20px; font-size: 13px; gap: 8px; }
+  .ftr__line + .ftr__line { margin-top: 4px; }
+  .ftr__base { padding-top: 18px; font-size: 13px; gap: 6px; }
   .ftr__copy { padding-left: 0; border-left: 0; }
-  .ftopo { top: auto; width: 100%; height: 360px; opacity: 0.85; }
+  .ftopo { width: 100%; height: 100%; opacity: 1; }
 }
 
 /* reveals: the block is observed, only its children move */

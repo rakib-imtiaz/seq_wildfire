@@ -1,34 +1,27 @@
-import { useCallback, useState } from "react";
-import { Header, Footer } from "./sections/Chrome";
-import { Story } from "./sections/Story";
-import { StoryStatic } from "./sections/StoryStatic";
-import { Services } from "./sections/Services";
-import { Applications } from "./sections/Applications";
-import { Why, Commitment, CtaBand } from "./sections/Closing";
-import { Careers } from "./sections/Careers";
-import { QA, quality, useMotion } from "./lib/page";
-import { webglAvailable } from "./three/engine.js";
+import { lazy, Suspense } from "react";
+import { Header } from "./sections/Chrome";
+import { MobilePage } from "./sections/MobilePage";
+import { QA, useMedia } from "./lib/page";
+
+// the earlier desktop layout (the 3D story and the long sections), for review at ?layout=3d only
+const Classic = lazy(() => import("./sections/Classic").then((m) => ({ default: m.Classic })));
 
 export function App() {
-  const motion = useMotion();
-  const [gl] = useState(() => quality() !== "lite" && webglAvailable());
-  const [failed, setFailed] = useState(false);
-  const onFailed = useCallback(() => setFailed(true), []);
-  // the pinned story needs motion and WebGL; ?frame= review stills use the pinned layout too
-  const pinned = gl && !failed && (motion || QA.frame !== null);
+  // every width gets the card page: phones since 10-27, desktop since 10-30 (the user: the desktop layout "doesnt look
+  // professional at all.. the mobile one is good"); from 900 px it runs full width with 1080p footage
+  const phone = useMedia("(max-width: 899px)");
   return (
     <>
       <Header />
-      <main id="main">
-        {pinned ? <Story onFailed={onFailed} /> : <StoryStatic webgl={gl && !failed} />}
-        <Services />
-        <Applications />
-        <Why />
-        <Commitment />
-        <CtaBand />
-        <Careers />
-      </main>
-      <Footer />
+      {QA.classic && !phone ? (
+        <Suspense fallback={null}>
+          <Classic />
+        </Suspense>
+      ) : (
+        <main id="main">
+          <MobilePage desk={!phone} />
+        </main>
+      )}
     </>
   );
 }

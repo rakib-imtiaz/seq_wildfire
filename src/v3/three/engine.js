@@ -422,7 +422,7 @@ export async function createMaquette(canvas, opts = {}) {
   let narrow = false;
   let camDist = 1;
   // the share of the view's height the report card takes at the bottom in the closing shot (0 = the full frame)
-  let reserve = 0.3;
+  let reserve = 0;
   const FULL = [-1, 1, -1, 1];
   function solveCamera(P, clock, cam, aspect) {
     const K = keys[layout];

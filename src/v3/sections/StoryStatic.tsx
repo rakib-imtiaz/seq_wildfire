@@ -5,7 +5,6 @@ import { loadZone } from "../../lib/zone";
 import { afterPaint } from "../../lib/table3d";
 import { QA } from "../lib/page";
 import { StaticLabels } from "../components/Labels";
-import { ReportCard } from "../components/ReportCard";
 import { BeatFacts } from "../components/BeatFacts";
 import { StaticThermalFrame } from "../components/ThermalFrame";
 
@@ -64,7 +63,8 @@ export function StoryStatic({ webgl }: { webgl: boolean }) {
       const wide = fw >= 560;
       const w = Math.min(1100, fw), h = Math.round(w * (wide ? 0.62 : 0.92));
       size.current = { w, h, layout: wide ? "wide" : "tall" };
-      for (let k = 0; k < BEATS.length; k++) {
+      // chapter 01 is the video hero above (sections/DeskHero)
+      for (let k = 1; k < BEATS.length; k++) {
         const s = await m.renderStill(k, w, h, { lens: k === 2 ? lens : "all", layout: size.current.layout, full: true });
         if (dead) return;
         urls.current.push(s.url);
@@ -104,6 +104,7 @@ export function StoryStatic({ webgl }: { webgl: boolean }) {
   return (
     <section id="story" className="ss" aria-label="How the service works">
       {BEATS.map((b, i) => {
+        if (i === 0) return null;
         const s = stills[i];
         const fb = FALLBACK[b.id];
         const H = i === 0 ? "h1" : "h2";
@@ -130,7 +131,7 @@ export function StoryStatic({ webgl }: { webgl: boolean }) {
               ) : null}
               <BeatFacts beat={b} lens={lens} />
             </div>
-            <div className="ss__fig" ref={i === 0 ? figRef : undefined}>
+            <div className="ss__fig" ref={i === 1 ? figRef : undefined}>
               <figure className="ss__frame" style={{ aspectRatio: failed ? undefined : `${size.current.w} / ${size.current.h}` }}>
                 {failed ? (
                   <img src={fb.src} alt={fb.alt} loading={i === 0 ? "eager" : "lazy"} decoding="async" />
@@ -145,7 +146,6 @@ export function StoryStatic({ webgl }: { webgl: boolean }) {
                   <span className="ss__wait" />
                 )}
               </figure>
-              {b.id === "report" ? <ReportCard className="ss__card" /> : null}
             </div>
           </article>
         );

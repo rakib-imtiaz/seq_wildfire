@@ -17,7 +17,7 @@ export function glide(e: RMouseEvent<HTMLAnchorElement>, href: string) {
   scrollToSection(href);
 }
 
-function scrollToSection(href: string) {
+export function scrollToSection(href: string) {
   const el = document.querySelector<HTMLElement>(href);
   if (!el) return;
   const hdr = document.querySelector<HTMLElement>(".hdr")?.offsetHeight ?? 64;
@@ -39,13 +39,15 @@ function scrollToSection(href: string) {
 export function Header() {
   const [open, setOpen] = useState(false);
   const [here, setHere] = useState<string | null>(null);
+  const [links, setLinks] = useState<readonly (typeof NAV)[number][]>(NAV);
   const btn = useRef<HTMLButtonElement>(null);
   const sheet = useRef<HTMLDivElement>(null);
 
-  // the section in view
+  // the sections this page has (the 3D model is desktop only), and the one in view
   useEffect(() => {
     const els = NAV.map((n) => document.getElementById(n.id)).filter((e): e is HTMLElement => !!e);
     if (!els.length) return;
+    setLinks(NAV.filter((n) => els.some((e) => e.id === n.id)));
     const io = new IntersectionObserver(
       (es) => {
         for (const e of es) if (e.isIntersecting) setHere(e.target.id);
@@ -79,7 +81,7 @@ export function Header() {
         <BrandMark />
       </a>
       <nav className="hdr__nav" aria-label="Sections">
-        {NAV.map((n) => (
+        {links.map((n) => (
           <a key={n.id} href={n.href} className="hdr__link" aria-current={here === n.id ? "true" : undefined} onClick={(e) => glide(e, n.href)}>
             {n.label}
           </a>
@@ -95,7 +97,7 @@ export function Header() {
       <div ref={sheet} id="hdr-sheet" className="sheet" hidden={!open} tabIndex={-1}>
         <nav aria-label="Sections">
           <ol className="sheet__list">
-            {NAV.map((n, i) => (
+            {links.map((n, i) => (
               <li key={n.id}>
                 <a
                   href={n.href}

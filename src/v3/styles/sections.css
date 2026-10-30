@@ -1,3 +1,77 @@
+/* ---------------------------------------------------------------- desktop hero: chapter 01 as a loop from the film (DeskHero) */
+.dh { position: relative; height: 100svh; min-height: 620px; overflow: hidden; background: #0e1012; color: #fff; }
+.dh__v { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
+.dh::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(8, 10, 12, 0.46) 0, rgba(8, 10, 12, 0) 16%),
+    linear-gradient(90deg, rgba(8, 10, 12, 0.64) 0, rgba(8, 10, 12, 0.3) 38%, rgba(8, 10, 12, 0) 62%),
+    linear-gradient(0deg, rgba(8, 10, 12, 0.36) 0, rgba(8, 10, 12, 0) 30%);
+}
+.dh__in {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: calc(var(--hdr) + 24px) var(--pad) clamp(40px, 7vh, 72px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+}
+.dh__txt { display: flex; flex-direction: column; align-items: flex-start; max-width: 620px; }
+.dh__k { font-family: var(--f-m); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255, 255, 255, 0.82); }
+.dh__t { margin: 18px 0 18px; font-family: var(--f-d); font-weight: 600; font-size: clamp(52px, 5.6vw, 92px); line-height: 1.01; letter-spacing: -0.02em; text-wrap: balance; }
+.dh__l { max-width: 30ch; font-size: clamp(18px, 1.3vw, 21px); line-height: 1.45; color: rgba(255, 255, 255, 0.9); }
+.dh__watch {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 34px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--f-d);
+  font-weight: 500;
+  font-size: 17px;
+  color: #fff;
+  cursor: pointer;
+}
+.dh__play { display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, 0.88); transition: background-color 220ms ease, color 220ms ease, transform 220ms var(--ease-out); }
+.dh__play svg { margin-left: 3px; }
+.dh__n { display: flex; align-items: center; gap: 14px; margin-top: 42px; font-family: var(--f-m); font-size: 13px; letter-spacing: 0.08em; color: rgba(255, 255, 255, 0.6); }
+.dh__n b { font-weight: 500; color: #fff; }
+.dh__n::after { content: ""; width: 56px; height: 2px; background: linear-gradient(90deg, #fff 0 45%, rgba(255, 255, 255, 0.3) 45%); }
+.dh__tag { position: absolute; z-index: 2; right: var(--pad); bottom: 18px; font-family: var(--f-m); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255, 255, 255, 0.66); }
+.dh__edge { position: absolute; left: 0; top: 55%; width: 1px; height: 1px; pointer-events: none; }
+@media (hover: hover) and (pointer: fine) {
+  .dh__watch:hover .dh__play { background: #fff; color: var(--ink); transform: scale(1.05); }
+}
+
+/* the film, full screen (components/FilmModal), phones and desktop */
+.mfilm { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; background: #000; }
+.mfilm__v { width: 100%; max-height: 100svh; background: #000; }
+.mfilm__x {
+  position: absolute;
+  z-index: 1;
+  top: calc(12px + env(safe-area-inset-top));
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  cursor: pointer;
+}
+.mfilm__tag { position: absolute; top: calc(22px + env(safe-area-inset-top)); left: 16px; font-family: var(--f-m); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255, 255, 255, 0.7); }
+
 /* ---------------------------------------------------------------- services: a capabilities index */
 .svc { padding: clamp(80px, 13vh, 150px) 0 clamp(56px, 9vh, 110px); }
 .svc__head {

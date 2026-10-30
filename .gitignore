@@ -8,3 +8,7 @@ review/*.png
 CLAUDE.md
 PROJECT_CONTEXT.md
 docs/history/
+
+# raw video deliveries (the web cuts live in public/media/video)
+media/incoming/*.mp4
+media/incoming/2k/
