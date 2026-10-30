@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { FILM } from "../data/copy";
+import { keepFocus } from "../lib/dialog";
 
 /** a looping clip may autoplay: motion on and no Data Saver */
 export const autoplayOK = () => {
@@ -15,10 +16,12 @@ export const autoplayOK = () => {
 export function FilmModal({ t, onClose }: { t: number; onClose: () => void }) {
   const ref = useRef<HTMLVideoElement>(null);
   const btn = useRef<HTMLButtonElement>(null);
+  const box = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const v = ref.current;
     const root = document.documentElement;
     const prev = root.style.overflow;
+    const back = document.activeElement as HTMLElement | null;
     root.style.overflow = "hidden";
     btn.current?.focus({ preventScroll: true });
     if (v) {
@@ -33,16 +36,17 @@ export function FilmModal({ t, onClose }: { t: number; onClose: () => void }) {
       if (v.readyState >= 1) start();
       else v.addEventListener("loadedmetadata", start, { once: true });
     }
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    const onKey = (e: KeyboardEvent) => (e.key === "Escape" ? onClose() : keepFocus(e, box.current));
     document.addEventListener("keydown", onKey);
     return () => {
       root.style.overflow = prev;
       document.removeEventListener("keydown", onKey);
       v?.pause();
+      back?.focus({ preventScroll: true });
     };
   }, [t, onClose]);
   return (
-    <div className="mfilm" role="dialog" aria-modal="true" aria-label={FILM.title}>
+    <div ref={box} className="mfilm" role="dialog" aria-modal="true" aria-label={FILM.title}>
       <button ref={btn} type="button" className="mfilm__x" onClick={onClose} aria-label="Close">
         <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />

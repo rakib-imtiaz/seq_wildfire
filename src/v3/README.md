@@ -103,3 +103,16 @@ The main page since 2026-10-21: served at `/` (`index.html` → `src/v3/main.tsx
     - With motion off, the still is all there is. The video no longer carries a poster attribute.
     - The light cards' fade mask moved to the wrapper, so it covers both.
     - The lenses still frames the drone top centre (the clip has it upper left), so that one cross-dissolves like a cut.
+- **Audit fixes (2026-10-30, the user: "did u apply the impeccable edits?").** From the impeccable audit (13/20):
+    - **Focus:** keyboard focus is white on the dark surfaces (hero, video cards, footers, film). Cobalt on near-black was 2.7:1.
+    - **Pause:** a pause button beside "Illustrative footage" holds every loop and the 3D tour (WCAG 2.2.2). It's remembered on the device (`LoopsHeld`, `lib/page.ts`) and hidden with motion off.
+    - **Footage label:** it sits on a dark chip, readable over any frame.
+    - **Pop-ups:** the card sheet and the film keep Tab inside and give focus back to their button on close (`lib/dialog.ts`).
+    - **Landmarks:** the card page's sections are `<main>` and its footer sits beside it.
+    - **Model:** WebGL is checked once.
+    - **Header:** it reads its section list again across 900 px.
+  - Not changed, needing the user or a browser:
+    - the square header button against the pill buttons (a design call);
+    - the six footer greys;
+    - the glass blur over playing video and the 23 MB 1440p hero (quality was the user's call);
+    - the tour at 768 px tall and the header at 1100-1280 px.

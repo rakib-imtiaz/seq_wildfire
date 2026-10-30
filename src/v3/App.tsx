@@ -18,9 +18,7 @@ export function App() {
           <Classic />
         </Suspense>
       ) : (
-        <main id="main">
-          <MobilePage desk={!phone} />
-        </main>
+        <MobilePage desk={!phone} />
       )}
     </>
   );

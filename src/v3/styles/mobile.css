@@ -94,7 +94,23 @@ html[data-mp][data-hdr="over"] .hdr:not([data-open]) .hdr__menu { border-color: 
 }
 .mh__play { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, 0.85); }
 .mh__play .mi { margin-left: 2px; }
-.mh__tag { position: absolute; z-index: 2; right: 16px; top: calc(var(--hdr) + 12px); font-family: var(--f-m); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255, 255, 255, 0.72); }
+/* the footage label and its pause (the 10-30 audit: the label was 3.4:1 over bright footage; loops need a pause) */
+.mh__aux { position: absolute; z-index: 2; right: 12px; top: calc(var(--hdr) + 10px); display: flex; align-items: center; gap: 8px; }
+.mh__tag { padding: 6px 10px; border-radius: 999px; background: rgba(8, 10, 12, 0.5); font-family: var(--f-m); font-size: 9.5px; line-height: 1.2; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255, 255, 255, 0.94); }
+.mh__hold {
+  -webkit-tap-highlight-color: transparent;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(8, 10, 12, 0.5);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 200ms ease;
+}
 .mh__edge { position: absolute; left: 0; top: 45%; width: 1px; height: 1px; pointer-events: none; }
 
 /* ---------------------------------------------------------------- 02-07: tall cards */
@@ -304,7 +320,8 @@ html[data-motion="on"] .msheet__box { animation: m-sheet 380ms var(--ease-out); 
   .mh__l { max-width: 32ch; font-size: clamp(18px, 1.35vw, 24px); }
   .mh__watch { gap: 16px; margin-top: 32px; font-size: 17px; }
   .mh__play { width: 60px; height: 60px; transition: background-color 220ms ease, color 220ms ease, transform 220ms var(--ease-out); }
-  .mh__tag { top: auto; right: var(--pad); bottom: 26px; font-size: 10.5px; }
+  .mh__aux { top: auto; right: var(--pad); bottom: 24px; gap: 10px; }
+  .mh__tag { font-size: 10.5px; }
   .mh__edge { top: 55%; }
 
   /* 02-07 */
@@ -365,6 +382,12 @@ html[data-motion="on"] .msheet__box { animation: m-sheet 380ms var(--ease-out); 
   .msheet__grip { display: none; }
   .msheet__t { font-size: 32px; }
   .msheet__l { font-size: 16px; }
+}
+/* keyboard focus on the dark surfaces: white (the 10-30 audit: cobalt on near-black is 2.7:1) */
+.mh :focus-visible, .mc--photo :focus-visible, .mfoot :focus-visible, .dfoot :focus-visible, .mfilm :focus-visible,
+html[data-hdr="over"] .hdr:not([data-open]) :focus-visible { outline-color: #fff; }
+@media (hover: hover) and (pointer: fine) {
+  .mh__hold:hover { background: rgba(8, 10, 12, 0.72); }
 }
 @media (min-width: 900px) and (hover: hover) and (pointer: fine) {
   .mh__watch:hover .mh__play { background: #fff; color: var(--m-ink); transform: scale(1.05); }

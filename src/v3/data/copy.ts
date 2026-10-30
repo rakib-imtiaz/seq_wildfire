@@ -247,6 +247,7 @@ export const MOBILE = {
   ],
   guarding: "Guarding services",
   foot: { explore: "Explore", contact: "Contact" },
+  footage: { pause: "Pause the footage", play: "Play the footage" },
   sample: "SAMPLE",
 } as const;
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { motionOn } from "../../lib/motion";
 
 /**
@@ -35,6 +35,27 @@ export function quality(): Quality {
 }
 
 export { motionOn };
+
+/**
+ * The visitor's pause for everything on the card page that moves on its own: the hero loop, the card loops and the 3D
+ * tour (WCAG 2.2.2; the 10-30 audit). Set by the hero's pause button, remembered on this device.
+ */
+export const LoopsHeld = createContext(false);
+const HOLD = "seq-footage-paused";
+export function readHold(): boolean {
+  try {
+    return localStorage.getItem(HOLD) === "1";
+  } catch {
+    return false;
+  }
+}
+export function writeHold(v: boolean) {
+  try {
+    localStorage.setItem(HOLD, v ? "1" : "0");
+  } catch {
+    /* private mode: the pause still holds for this visit */
+  }
+}
 
 export function useMotion(): boolean {
   const [on, setOn] = useState(motionOn);

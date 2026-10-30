@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent as RKeyboardEvent } from "react";
+import { useCallback, useContext, useEffect, useRef, useState, type KeyboardEvent as RKeyboardEvent } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
@@ -6,7 +6,7 @@ import { BEATS, LENS_BUTTONS, SAMPLE_NOTE } from "../data/copy";
 import { createMaquette, type FrameInfo, type LensId, type Maquette } from "../three/engine.js";
 import { loadZone } from "../../lib/zone";
 import { afterPaint } from "../../lib/table3d";
-import { QA, motionOn, quality } from "../lib/page";
+import { LoopsHeld, QA, motionOn, quality } from "../lib/page";
 import { Labels, type LabelLayer } from "../components/Labels";
 import { Icon } from "../components/Icon";
 import { BeatFacts } from "../components/BeatFacts";
@@ -62,6 +62,8 @@ export function Story({ onFailed, tour = false }: { onFailed: () => void; tour?:
   const tw = useRef<gsap.core.Tween | null>(null);
   // the visitor paused or stepped: the tour doesn't restart itself until they press play
   const held = useRef(false);
+  // the card page's pause (its hero button) holds the tour too
+  const hold = useContext(LoopsHeld);
 
   const drive = useCallback((P: number) => {
     Pref.current = P;
@@ -263,7 +265,7 @@ export function Story({ onFailed, tour = false }: { onFailed: () => void; tour?:
       ([e]) => {
         if (e.intersectionRatio >= 0.5) {
           eng.current?.start();
-          if (motionOn() && !held.current) setPlaying(true);
+          if (motionOn() && !held.current && !hold) setPlaying(true);
         } else if (e.intersectionRatio < 0.15) {
           setPlaying(false);
           held.current = false;
@@ -278,7 +280,7 @@ export function Story({ onFailed, tour = false }: { onFailed: () => void; tour?:
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [tour, ready, drive]);
+  }, [tour, ready, drive, hold]);
 
   /* ---- lens isolation (coverage beat) ---- */
   const pickLens = (id: LensId) => {

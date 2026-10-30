@@ -6,7 +6,7 @@ import { Icon } from "../components/Icon";
 import { Wordmark } from "../../components/Logo";
 import { BrandMark } from "../components/BrandMark";
 import { FooterTopo } from "../components/FooterTopo";
-import { motionOn } from "../lib/page";
+import { motionOn, useMedia } from "../lib/page";
 
 gsap.registerPlugin(ScrollToPlugin);
 
@@ -40,6 +40,8 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [here, setHere] = useState<string | null>(null);
   const [links, setLinks] = useState<readonly (typeof NAV)[number][]>(NAV);
+  // across 900 px the page swaps its sections (the 3D model is desktop only), so the list is read again
+  const phone = useMedia("(max-width: 899px)");
   const btn = useRef<HTMLButtonElement>(null);
   const sheet = useRef<HTMLDivElement>(null);
 
@@ -56,7 +58,7 @@ export function Header() {
     );
     els.forEach((e) => io.observe(e));
     return () => io.disconnect();
-  }, []);
+  }, [phone]);
 
   // the sheet: scroll lock, Escape, focus in and back
   useEffect(() => {

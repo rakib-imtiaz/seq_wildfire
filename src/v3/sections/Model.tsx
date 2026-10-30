@@ -5,7 +5,8 @@ import { webglAvailable } from "../three/util.js";
 const Story = lazy(() => import("./Story").then((m) => ({ default: m.Story })));
 
 /** the model can run here (the desktop footer lists it only then) */
-export const modelOK = () => quality() !== "lite" && webglAvailable();
+let can: boolean | undefined;
+export const modelOK = () => (can ??= quality() !== "lite" && webglAvailable());
 
 /**
  * The 3D model on the desktop card page (10-30, the user: "add that animation somewhere in desktop version maybe a
