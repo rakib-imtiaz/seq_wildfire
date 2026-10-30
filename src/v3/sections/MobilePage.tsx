@@ -37,12 +37,18 @@ function MI({ n, s = 22 }: { n: keyof typeof PATHS; s?: number }) {
   );
 }
 
-/** a looping clip: its first frame shows at once; it plays only while on screen (and never with motion off) */
+/**
+ * A looping clip under its still (10-30, the user: "do same for all sections initial images"): the still, a sharp
+ * generated picture of the same shot, shows at once and dissolves once the clip is playing; the clip plays only while
+ * on screen, and never with motion off (then the still is all there is).
+ */
 function Clip({ src, poster, className = "", start = 0.4 }: { src: string; poster: string; className?: string; start?: number }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [on] = useState(live);
+  const [rolling, setRolling] = useState(false);
   useEffect(() => {
     const v = ref.current;
+    setRolling(false);
     if (!v || !on || typeof IntersectionObserver === "undefined") return;
     v.muted = true;
     v.defaultMuted = true;
@@ -52,19 +58,25 @@ function Clip({ src, poster, className = "", start = 0.4 }: { src: string; poste
     return () => io.disconnect();
   }, [on, src]);
   return (
-    <video
-      ref={ref}
-      className={`mclip ${className}`}
-      src={on ? `${src}#t=${start}` : undefined}
-      poster={poster}
-      muted
-      playsInline
-      loop
-      preload="none"
-      disablePictureInPicture
-      aria-hidden="true"
-      tabIndex={-1}
-    />
+    <div className={`mclipw ${className}`}>
+      <video
+        ref={ref}
+        className="mclip"
+        src={on ? `${src}#t=${start}` : undefined}
+        muted
+        playsInline
+        loop
+        preload="none"
+        disablePictureInPicture
+        aria-hidden="true"
+        tabIndex={-1}
+        onTimeUpdate={(e) => {
+          const v = e.currentTarget;
+          if (!rolling && !v.paused && v.currentTime > start + 0.25) setRolling(true);
+        }}
+      />
+      <img className="mclip__still" src={poster} alt="" aria-hidden="true" loading="lazy" decoding="async" data-off={rolling ? "" : undefined} />
+    </div>
   );
 }
 /** a card's loop: phones 720p, desktop 1080p ("-hd"), 2K screens 1440p ("-2k") for the full-width ones */

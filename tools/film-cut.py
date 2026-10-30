@@ -23,8 +23,12 @@ K2 = os.path.join(INC, "2k")
 PHONE = os.path.join(INC, "sequoia-phone-heroes-stitched.mp4")
 OUT = os.path.join(ROOT, "public", "media", "video")
 S0 = 2 / 48  # each 2K clip's first frame can be a stray frame or a hard white flash
-# generated stills (10-30): while these exist, tools/stills.py owns the hero and careers stills
+# generated stills (10-30): while media/incoming/gen/<name>.png exists, tools/stills.py owns that poster
 GEN = os.path.join(INC, "gen")
+
+
+def generated(name):
+    return os.path.exists(os.path.join(GEN, name + ".png"))
 
 
 def scene(n):
@@ -108,7 +112,8 @@ def film():
     run([*ins, "-filter_complex", graph, "-map", "[vc]", "-map", "[ao]",
          "-c:v", "libx264", "-preset", "medium", "-crf", "24", "-maxrate", "1800k", "-bufsize", "3600k", "-profile:v", "high", "-pix_fmt", "yuv420p",
          "-c:a", "aac", "-b:a", "96k", "-ac", "1", "-movflags", "+faststart", dst])
-    poster(scene(4), 7.6, os.path.join(OUT, "film-poster.webp"), 1280)
+    if not generated("film-poster"):
+        poster(scene(4), 7.6, os.path.join(OUT, "film-poster.webp"), 1280)
     return dst, round(t, 2), starts
 
 
@@ -140,7 +145,7 @@ def desk_hero(width=1920, sfx=""):
 
 
 def hero_still(width, sfx=""):
-    if os.path.exists(os.path.join(GEN, "hero-still.png")):
+    if generated("hero-still"):
         return
     poster(DESK[0][0], 7.52, os.path.join(OUT, f"d-hero{sfx}.webp"), width, q=90, sharpen=0.35)
 
@@ -157,7 +162,8 @@ def hero():
     run(["-i", PHONE, "-i", launch, "-filter_complex", graph, "-map", "[v]", "-an",
          "-c:v", "libx264", "-preset", "slow", "-crf", "27", "-maxrate", "1600k", "-bufsize", "3200k", "-profile:v", "high",
          "-pix_fmt", "yuv420p", "-movflags", "+faststart", dst])
-    poster(PHONE, 1.49, os.path.join(OUT, "s-hero.webp"), 720)
+    if not generated("phone-hero"):
+        poster(PHONE, 1.49, os.path.join(OUT, "s-hero.webp"), 720)
     return [dst]
 
 
@@ -196,7 +202,8 @@ def cards(width=1280, sfx="", ids=None):
         vf = f"trim=start={a}:end={b},setpts=PTS-STARTPTS,{base},fade=t=in:st=0:d=0.35:color={col},fade=t=out:st={d - 0.35:.3f}:d=0.35:color={col}"
         dst = os.path.join(OUT, f"c-{cid}{sfx}.mp4")
         run(["-i", scene(n), "-vf", vf, *enc, dst])
-        poster(scene(n), a + 0.4, os.path.join(OUT, f"c-{cid}{sfx}.webp"), width)
+        if not generated(f"card-{cid}"):
+            poster(scene(n), a + 0.4, os.path.join(OUT, f"c-{cid}{sfx}.webp"), width)
         out.append(dst)
     for cid, n, a, b, boom in SLOW:
         if ids and cid not in ids:
@@ -209,10 +216,11 @@ def cards(width=1280, sfx="", ids=None):
             graph = f"[0:v]{slow},fade=t=in:st=0:d=0.4:color=0x0E1012,fade=t=out:st={d - 0.4:.3f}:d=0.4:color=0x0E1012[v]"
         dst = os.path.join(OUT, f"c-{cid}{sfx}.mp4")
         run(["-i", scene(n), "-filter_complex", graph, "-map", "[v]", *enc, dst])
-        poster(scene(n), a if boom else a + 0.2, os.path.join(OUT, f"c-{cid}{sfx}.webp"), width)
+        if not generated(f"card-{cid}"):
+            poster(scene(n), a if boom else a + 0.2, os.path.join(OUT, f"c-{cid}{sfx}.webp"), width)
         out.append(dst)
     for sid, n, t, crop, w in {"": STILLS, "-hd": STILLS_HD}.get(sfx, []):
-        if os.path.exists(os.path.join(GEN, "careers-still.png")):
+        if generated("careers-still"):
             break
         dst = os.path.join(OUT, f"st-{sid}{sfx}.webp")
         poster(scene(n), t, dst, w, crop)
