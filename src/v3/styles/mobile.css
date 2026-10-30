@@ -60,7 +60,9 @@ html[data-mp][data-hdr="over"] .hdr:not([data-open]) .hdr__menu { border-color: 
 .mbtn--sm { height: 34px; padding: 0 13px; font-size: 12.5px; gap: 6px; }
 /* ---------------------------------------------------------------- 01: the hero */
 .mh { position: relative; height: max(560px, 92svh); overflow: hidden; background: #0e1012; color: #fff; }
-.mh__v { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; object-position: 50% 30%; }
+.mh__v, .mh__still { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; object-position: 50% 30%; }
+.mh__still { pointer-events: none; transition: opacity 900ms var(--ease-out); }
+.mh__still[data-off] { opacity: 0; }
 .mh::after {
   content: "";
   position: absolute;
@@ -287,7 +289,7 @@ html[data-motion="on"] .msheet__box { animation: m-sheet 380ms var(--ease-out); 
 
   /* 01 */
   .mh { height: 100svh; min-height: 640px; }
-  .mh__v { object-position: 50% 50%; }
+  .mh__v, .mh__still { object-position: 50% 50%; }
   .mh::after {
     background:
       linear-gradient(180deg, rgba(8, 10, 12, 0.42) 0, rgba(8, 10, 12, 0) 16%),
@@ -341,7 +343,7 @@ html[data-motion="on"] .msheet__box { animation: m-sheet 380ms var(--ease-out); 
   /* careers: the still on the left, the role and the apply button on the right */
   .mcar { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); min-height: clamp(620px, 46vw, 1000px); }
   .mcar__media { aspect-ratio: auto; }
-  .mcar__media .mimg { position: absolute; inset: 0; }
+  .mcar__media .mimg { position: absolute; inset: 0; object-position: 35% 50%; }
   .mcar__live { left: var(--pad); top: 28px; }
   .mcar__body { justify-content: center; padding: clamp(56px, 5vw, 112px) var(--pad) clamp(56px, 5vw, 112px) clamp(40px, 5vw, 112px); }
   .mcar__t { margin: 20px 0 10px; font-size: clamp(44px, 4.2vw, 84px); line-height: 1.02; letter-spacing: -0.018em; }
@@ -352,25 +354,6 @@ html[data-motion="on"] .msheet__box { animation: m-sheet 380ms var(--ease-out); 
   .mcar__apply { width: auto; min-width: 300px; height: 60px; margin-top: 32px; gap: 28px; font-size: 17px; }
   .mcar__mail { font-size: 15px; }
   .mcar__more { margin-top: 10px; font-size: 16px; }
-
-  /* footer: the brand and sign-off, the link rows, the contact; the note across the bottom */
-  .mfoot {
-    display: grid;
-    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 0.9fr);
-    grid-template-rows: auto 1fr auto auto;
-    grid-template-areas: "mark nav contact" "sign nav contact" "note note note" "copy copy copy";
-    column-gap: clamp(40px, 6vw, 120px);
-    padding: clamp(72px, 7vw, 128px) var(--pad) 36px;
-  }
-  .mfoot__mark { grid-area: mark; justify-self: start; height: clamp(18px, 1.5vw, 28px); }
-  .mfoot__sign { grid-area: sign; margin-top: 22px; max-width: 24ch; font-size: clamp(17px, 1.25vw, 22px); }
-  .mfoot__nav { grid-area: nav; align-self: start; margin-top: 0; }
-  .mfoot__nav > * { min-height: 64px; font-size: clamp(18px, 1.3vw, 22px); transition: color 200ms ease; }
-  .mfoot__nav .mi { transition: color 200ms ease, transform 220ms var(--ease-out); }
-  .mfoot__contact { grid-area: contact; align-content: start; gap: 18px; margin-top: 0; }
-  .mfoot__contact a, .mfoot__contact address { font-size: clamp(15.5px, 1.1vw, 18px); }
-  .mfoot__note { grid-area: note; margin-top: clamp(56px, 6vw, 104px); }
-  .mfoot__copy { grid-area: copy; }
 
   /* the sheet: a side panel */
   .msheet { justify-content: flex-end; align-items: stretch; }
@@ -384,11 +367,41 @@ html[data-motion="on"] .msheet__box { animation: m-sheet 380ms var(--ease-out); 
   .mh__watch:hover .mh__play { background: #fff; color: var(--m-ink); transform: scale(1.05); }
   .marrow:hover .marrow__i { background: var(--m-ink); border-color: var(--m-ink); color: #fff; }
   .mc--photo .marrow:hover .marrow__i { background: #fff; border-color: #fff; color: var(--m-ink); }
-  .marrow:hover .marrow__i .mi, .mc__go:hover .mi, .mfoot__nav > a:hover .mi { transform: translateX(4px); }
+  .marrow:hover .marrow__i .mi, .mc__go:hover .mi, .dfoot__cta:hover .mi { transform: translateX(4px); }
   .mc__go:hover { background: #fff; color: var(--m-ink); }
-  .mfoot__nav > *:hover { color: #fff; }
-  .mfoot__nav > *:hover .mi { color: var(--cobalt); }
+  .dfoot__col a:hover, .dfoot__col button:hover { color: #fff; }
+  .dfoot__col a:hover .mi, .dfoot__col button:hover .mi { color: #fff; transform: translate(2px, 0); }
   .mbtn--fill:hover { background: var(--cobalt-d); }
   .msheet .mbtn--line:hover { background: rgba(20, 23, 26, 0.06); }
   .mcar__more:hover { text-decoration: underline; text-underline-offset: 4px; }
 }
+
+/* the desktop footer (10-30, the user: "make the footer look good"): the sign-off and the proposal button, two short
+   columns, the wordmark across the full width, the note */
+.dfoot { padding: clamp(80px, 8vw, 140px) var(--pad) 32px; background: #0b0c0e; color: #e7e8e8; }
+.dfoot__top { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 0.7fr) minmax(0, 0.9fr); gap: clamp(40px, 6vw, 120px); align-items: start; }
+.dfoot__sign { max-width: 17ch; font-family: var(--f-d); font-weight: 400; font-size: clamp(30px, 2.8vw, 54px); line-height: 1.1; letter-spacing: -0.015em; color: #f2f3f3; text-wrap: balance; }
+.dfoot__cta { height: 56px; margin-top: 36px; padding: 0 26px; gap: 14px; font-size: 16px; }
+.dfoot__cta .mi { transition: transform 220ms var(--ease-out); }
+.dfoot__col { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+.dfoot__k { margin-bottom: 8px; font-family: var(--f-m); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #80858b; }
+.dfoot__col a, .dfoot__col button, .dfoot__col address {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--f-d);
+  font-size: clamp(16px, 1.15vw, 19px);
+  line-height: 1.4;
+  font-style: normal;
+  color: #d9dbdc;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 200ms ease;
+}
+.dfoot__col address { flex-direction: column; align-items: flex-start; gap: 0; cursor: auto; }
+.dfoot__col .mi { color: #80858b; transition: color 200ms ease, transform 220ms var(--ease-out); }
+.dfoot__mark { display: block; width: 100%; height: auto; aspect-ratio: 1480 / 100; margin-top: clamp(80px, 9vw, 160px); color: #f2f3f3; }
+.dfoot__base { display: flex; justify-content: space-between; gap: 24px; margin-top: clamp(32px, 3vw, 48px); padding-top: 22px; border-top: 1px solid rgba(255, 255, 255, 0.12); font-size: 13.5px; line-height: 1.5; color: #80858b; }

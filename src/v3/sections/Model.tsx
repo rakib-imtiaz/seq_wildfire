@@ -4,6 +4,9 @@ import { webglAvailable } from "../three/util.js";
 
 const Story = lazy(() => import("./Story").then((m) => ({ default: m.Story })));
 
+/** the model can run here (the desktop footer lists it only then) */
+export const modelOK = () => quality() !== "lite" && webglAvailable();
+
 /**
  * The 3D model on the desktop card page (10-30, the user: "add that animation somewhere in desktop version maybe a
  * section in the header"): the maquette's chapters 02-07 as a one-screen tour (sections/Story, `tour`) after card 06,
@@ -11,7 +14,7 @@ const Story = lazy(() => import("./Story").then((m) => ({ default: m.Story })));
  */
 export function Model() {
   const box = useRef<HTMLDivElement>(null);
-  const [ok] = useState(() => quality() !== "lite" && webglAvailable());
+  const [ok] = useState(modelOK);
   const [near, setNear] = useState(false);
   const [failed, setFailed] = useState(false);
   const onFailed = useCallback(() => setFailed(true), []);

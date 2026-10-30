@@ -246,6 +246,7 @@ export const MOBILE = {
     { href: "#careers", label: "Careers" },
   ],
   guarding: "Guarding services",
+  foot: { explore: "Explore", contact: "Contact" },
   sample: "SAMPLE",
 } as const;
 

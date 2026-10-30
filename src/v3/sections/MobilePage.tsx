@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BEATS, CAREERS, CONTACT, CTA, FILM, FOOTNOTE, MOBILE, SIGNOFF } from "../data/copy";
+import { BEATS, CAREERS, CONTACT, CTA, FILM, FOOTNOTE, MOBILE, NAV, SIGNOFF } from "../data/copy";
 import { motionOn } from "../lib/page";
 import { BeatFacts } from "../components/BeatFacts";
 import { FilmModal } from "../components/FilmModal";
 import { Wordmark } from "../../components/Logo";
 import { glide } from "./Chrome";
-import { Model } from "./Model";
+import { Model, modelOK } from "./Model";
 
 /**
  * Phones (the user's second comp, 2026-10-27): seven tall edge-to-edge cards, no 3D. The user on the first build:
@@ -159,10 +159,64 @@ function Arrow({ onClick, label }: { onClick: () => void; label: string }) {
   );
 }
 
+/**
+ * The desktop footer (10-30, the user: "make the footer look good"): the sign-off large with the proposal button, the
+ * sections and the contact in two short columns, then the wordmark across the full width and the note under it.
+ */
+function DeskFoot({ onWatch }: { onWatch: () => void }) {
+  const [model] = useState(modelOK);
+  return (
+    <footer className="dfoot">
+      <div className="dfoot__top">
+        <div className="dfoot__lead">
+          <p className="dfoot__sign">{SIGNOFF}.</p>
+          <a className="mbtn mbtn--fill dfoot__cta" href={CTA.href}>
+            {CTA.label}
+            <MI n="arrow" s={18} />
+          </a>
+        </div>
+        <nav className="dfoot__col" aria-label="Footer">
+          <p className="dfoot__k">{MOBILE.foot.explore}</p>
+          {NAV.filter((n) => n.id !== "model" || model).map((n) => (
+            <a key={n.id} href={n.href} onClick={(e) => glide(e, n.href)}>
+              {n.label}
+            </a>
+          ))}
+          <button type="button" onClick={onWatch}>
+            {MOBILE.watch}
+            <MI n="play" s={12} />
+          </button>
+        </nav>
+        <div className="dfoot__col">
+          <p className="dfoot__k">{MOBILE.foot.contact}</p>
+          <a href={CONTACT.tel}>{CONTACT.phone}</a>
+          <address>
+            {CONTACT.address.map((l) => (
+              <span key={l}>{l}</span>
+            ))}
+          </address>
+          <a href={CONTACT.guarding.href} rel="noopener">
+            {MOBILE.guarding}
+            <MI n="out" s={16} />
+          </a>
+        </div>
+      </div>
+      <Wordmark className="dfoot__mark" />
+      <div className="dfoot__base">
+        <p>{FOOTNOTE}</p>
+        <p>© {new Date().getFullYear()} Sequoia Security</p>
+      </div>
+    </footer>
+  );
+}
+
 export function MobilePage({ desk = false }: { desk?: boolean }) {
   const heroV = useRef<HTMLVideoElement>(null);
   const edge = useRef<HTMLSpanElement>(null);
   const [on] = useState(live);
+  // the hero's still stays over the loop until it is playing past its fade-in (the user: a loop still loading showed
+  // a soft early frame; the still "should be something sharp")
+  const [rolling, setRolling] = useState(false);
   const [k2] = useState(wide);
   // the light cards fill 62% of the width, so 1080p covers them on any screen
   const res = (full: boolean) => (!desk ? "" : full && k2 ? "-2k" : "-hd");
@@ -249,6 +303,10 @@ export function MobilePage({ desk = false }: { desk?: boolean }) {
             className="mh__v"
             src={on ? (desk ? `${V}/d-hero${k2 ? "-2k" : ""}.mp4` : `${V}/s-hero.mp4#t=0.45`) : undefined}
             poster={desk ? `${V}/d-hero${k2 ? "-2k" : ""}.webp` : `${V}/s-hero.webp`}
+            onTimeUpdate={(e) => {
+              const v = e.currentTarget;
+              if (!rolling && !v.paused && v.currentTime > 0.6) setRolling(true);
+            }}
             muted
             playsInline
             loop
@@ -256,6 +314,14 @@ export function MobilePage({ desk = false }: { desk?: boolean }) {
             disablePictureInPicture
             aria-hidden="true"
             tabIndex={-1}
+          />
+          <img
+            className="mh__still"
+            src={desk ? `${V}/d-hero${k2 ? "-2k" : ""}.webp` : `${V}/s-hero.webp`}
+            alt=""
+            aria-hidden="true"
+            decoding="async"
+            data-off={rolling ? "" : undefined}
           />
           <div className="mh__txt">
             <K n={1} />
@@ -380,38 +446,42 @@ export function MobilePage({ desk = false }: { desk?: boolean }) {
         </div>
       </section>
 
-      <footer className="mfoot">
-        <Wordmark className="mfoot__mark" />
-        <p className="mfoot__sign">{SIGNOFF}.</p>
-        <nav className="mfoot__nav" aria-label="Footer">
-          {MOBILE.footer.map((l) => (
-            <a key={l.href} href={l.href} onClick={(e) => glide(e, l.href)}>
-              {l.label}
-              <MI n="arrow" s={18} />
+      {desk ? (
+        <DeskFoot onWatch={() => setFilm(0)} />
+      ) : (
+        <footer className="mfoot">
+          <Wordmark className="mfoot__mark" />
+          <p className="mfoot__sign">{SIGNOFF}.</p>
+          <nav className="mfoot__nav" aria-label="Footer">
+            {MOBILE.footer.map((l) => (
+              <a key={l.href} href={l.href} onClick={(e) => glide(e, l.href)}>
+                {l.label}
+                <MI n="arrow" s={18} />
+              </a>
+            ))}
+            <button type="button" onClick={() => setFilm(0)}>
+              {MOBILE.watch}
+              <MI n="play" s={14} />
+            </button>
+            <a href={CONTACT.guarding.href} rel="noopener">
+              {MOBILE.guarding}
+              <MI n="out" s={18} />
             </a>
-          ))}
-          <button type="button" onClick={() => setFilm(0)}>
-            {MOBILE.watch}
-            <MI n="play" s={14} />
-          </button>
-          <a href={CONTACT.guarding.href} rel="noopener">
-            {MOBILE.guarding}
-            <MI n="out" s={18} />
-          </a>
-        </nav>
-        <div className="mfoot__contact">
-          <a href={CONTACT.tel}>
-            <MI n="phone" s={18} />
-            {CONTACT.phone}
-          </a>
-          <address>
-            <MI n="pin" s={18} />
-            <span>{CONTACT.address.join(", ")}</span>
-          </address>
-        </div>
-        <p className="mfoot__note">{FOOTNOTE}</p>
-        <p className="mfoot__copy">© {new Date().getFullYear()} Sequoia Security</p>
-      </footer>
+          </nav>
+          <div className="mfoot__contact">
+            <a href={CONTACT.tel}>
+              <MI n="phone" s={18} />
+              {CONTACT.phone}
+            </a>
+            <address>
+              <MI n="pin" s={18} />
+              <span>{CONTACT.address.join(", ")}</span>
+            </address>
+          </div>
+          <p className="mfoot__note">{FOOTNOTE}</p>
+          <p className="mfoot__copy">© {new Date().getFullYear()} Sequoia Security</p>
+        </footer>
+      )}
 
       {sheet ? (
         <Sheet

@@ -19,6 +19,9 @@ const N = BEATS.length;
 /** chapter 01 is the video hero above (sections/DeskHero); the 3D story runs 02-07 (P = 1..6) */
 const FIRST = 1;
 const STEPS = N - 1 - FIRST;
+/** the tour: each chapter holds this long (from the middle of its glide), and one step's glide */
+const DWELL = 7000;
+const GLIDE = 2.4;
 /** inactive beats: out of the tab order and the accessibility tree (React 18 types have no `inert`) */
 const INERT = { inert: "", "aria-hidden": true } as unknown as React.HTMLAttributes<HTMLElement>;
 const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
@@ -32,9 +35,11 @@ const smooth = (a: number, b: number, x: number) => {
  * one beat per gesture (a gesture moves at most one beat from the last settled one; a long deliberate drag snaps to
  * the nearest). Prev / next arrows and an autoplay tour (pause at any time) drive the same scroll, so the URL,
  * the scrollbar and the story always agree.
- * `tour` (10-30, the desktop card page, sections/Model): the same stage in one screen, not pinned. Prev / next and the
- * tour glide P on a timer instead of scrolling the page; the tour plays while the section is in view and loops, and
- * the engine sleeps when it isn't.
+ * `tour` (10-30, the desktop card page, sections/Model): the same stage in one screen, not pinned. A row of chapter
+ * tabs, prev / next and the tour glide P instead of scrolling the page (the user: "manual control to switch the
+ * scenarios", "smoothly show the full animation"). Each visit tours from 02 and loops; a tab or a step hands control
+ * to the visitor until they press play; the engine sleeps out of view. The text crossfades (no scramble, no rising
+ * words) so nothing reads half-drawn mid-glide.
  */
 export function Story({ onFailed, tour = false }: { onFailed: () => void; tour?: boolean }) {
   const track = useRef<HTMLElement>(null);
@@ -182,7 +187,8 @@ export function Story({ onFailed, tour = false }: { onFailed: () => void; tour?:
         return;
       }
       const o = { p: Pref.current };
-      tw.current = gsap.to(o, { p: n, duration: Math.min(2.2, 1 + 0.4 * Math.abs(n - o.p)), ease: "power2.inOut", onUpdate: () => drive(o.p) });
+      const d = Math.abs(n - o.p);
+      tw.current = gsap.to(o, { p: n, duration: Math.min(3.6, GLIDE + 0.45 * (d - 1)), ease: "power2.inOut", onUpdate: () => drive(o.p) });
       return;
     }
     const st = stRef.current;
@@ -222,32 +228,34 @@ export function Story({ onFailed, tour = false }: { onFailed: () => void; tour?:
 
   /* ---- autoplay tour, paused by any input ---- */
   useEffect(() => {
-    if (!playing) return;
+    if (!playing || tour) return;
     const stop = () => setPlaying(false);
     const t = window.setInterval(() => {
       if (beatRef.current >= N - 1) {
-        // the tour loops; the pinned story stops at the end
-        if (tour) restart();
-        else setPlaying(false);
+        setPlaying(false);
         return;
       }
       goTo(beatRef.current + 1);
-    }, tour ? 6000 : 4200);
-    // the pinned story stops on any input; the tour keeps playing while the page scrolls past
-    if (!tour) {
-      window.addEventListener("wheel", stop, { passive: true });
-      window.addEventListener("touchstart", stop, { passive: true });
-      window.addEventListener("keydown", stop);
-    }
+    }, 4200);
+    window.addEventListener("wheel", stop, { passive: true });
+    window.addEventListener("touchstart", stop, { passive: true });
+    window.addEventListener("keydown", stop);
     return () => {
       window.clearInterval(t);
       window.removeEventListener("wheel", stop);
       window.removeEventListener("touchstart", stop);
       window.removeEventListener("keydown", stop);
     };
-  }, [playing, goTo, tour, restart]);
+  }, [playing, goTo, tour]);
 
-  /* ---- the tour: plays while in view; the engine sleeps when it's out of view ---- */
+  /* ---- the tour: the next chapter after DWELL; after the last, a dip back to 02 ---- */
+  useEffect(() => {
+    if (!tour || !playing) return;
+    const t = window.setTimeout(() => (beatRef.current >= N - 1 ? restart() : goTo(beatRef.current + 1)), DWELL);
+    return () => window.clearTimeout(t);
+  }, [tour, playing, beat, goTo, restart]);
+
+  /* ---- the tour: plays from 02 while in view; out of view it resets and the engine sleeps ---- */
   useEffect(() => {
     const el = track.current;
     if (!tour || !ready || !el || typeof IntersectionObserver === "undefined") return;
@@ -257,15 +265,20 @@ export function Story({ onFailed, tour = false }: { onFailed: () => void; tour?:
           eng.current?.start();
           if (motionOn() && !held.current) setPlaying(true);
         } else if (e.intersectionRatio < 0.15) {
-          eng.current?.stop();
           setPlaying(false);
+          held.current = false;
+          tw.current?.kill();
+          settled.current = FIRST;
+          eng.current?.jump(FIRST);
+          drive(FIRST);
+          eng.current?.stop();
         }
       },
       { threshold: [0, 0.15, 0.5] },
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [tour, ready]);
+  }, [tour, ready, drive]);
 
   /* ---- lens isolation (coverage beat) ---- */
   const pickLens = (id: LensId) => {
@@ -310,15 +323,15 @@ export function Story({ onFailed, tour = false }: { onFailed: () => void; tour?:
                 <article key={b.id} className={`beat beat--${b.id}`} data-on={on ? "" : undefined} {...(on ? {} : INERT)}>
                   <p className="beat__k" aria-hidden="true">
                     <b>
-                      <Scramble text={String(i + 1).padStart(2, "0")} active={on} />
+                      <Scramble text={String(i + 1).padStart(2, "0")} active={on && !tour} />
                     </b>{" "}
                     / {String(N).padStart(2, "0")}
                   </p>
                   <H className={i === 0 ? "beat__h1" : "beat__h2"}>
-                    <SplitText text={b.title} />
+                    {tour ? b.title : <SplitText text={b.title} />}
                     {b.title2 ? (
                       <span className="beat__h1b">
-                        <SplitText text={b.title2} offset={b.title.split(" ").length} />
+                        {tour ? b.title2 : <SplitText text={b.title2} offset={b.title.split(" ").length} />}
                       </span>
                     ) : null}
                   </H>
@@ -333,38 +346,62 @@ export function Story({ onFailed, tour = false }: { onFailed: () => void; tour?:
                       ))}
                     </div>
                   ) : null}
-                  <BeatFacts beat={b} lens={lens} active={on} />
+                  <BeatFacts beat={b} lens={lens} active={on && !tour} />
                 </article>
               );
             })}
           </div>
-          <div className="st__ctl">
+          {/* the tour switches chapters with the tabs below */}
+          {tour ? null : (
+            <div className="st__ctl">
+              <button
+                type="button"
+                className="btn btn--icon"
+                onClick={() => {
+                  take();
+                  goTo(beat - 1);
+                }}
+                disabled={beat <= FIRST}
+                aria-label="Previous"
+              >
+                <Icon name="prev" />
+              </button>
+              <button
+                type="button"
+                className="btn btn--next"
+                onClick={() => {
+                  take();
+                  next();
+                }}
+              >
+                <span>{nextName}</span>
+                <Icon name="next" />
+              </button>
+              <button
+                type="button"
+                className="btn btn--icon"
+                onClick={() => {
+                  held.current = playing;
+                  setPlaying((p) => !p);
+                }}
+                aria-label={playing ? "Pause the tour" : "Play the tour"}
+                aria-pressed={playing}
+              >
+                <Icon name={playing ? "pause" : "play"} />
+              </button>
+              <ol className="st__rail" aria-hidden="true">
+                {BEATS.slice(FIRST).map((b, k) => (
+                  <li key={b.id} data-on={k + FIRST === beat ? "" : undefined} data-past={k + FIRST < beat ? "" : undefined} />
+                ))}
+              </ol>
+            </div>
+          )}
+        </div>
+        {tour ? (
+          <nav className="st__tabs" aria-label="Chapters">
             <button
               type="button"
-              className="btn btn--icon"
-              onClick={() => {
-                take();
-                goTo(beat - 1);
-              }}
-              disabled={beat <= FIRST}
-              aria-label="Previous"
-            >
-              <Icon name="prev" />
-            </button>
-            <button
-              type="button"
-              className="btn btn--next"
-              onClick={() => {
-                take();
-                next();
-              }}
-            >
-              <span>{nextName}</span>
-              <Icon name="next" />
-            </button>
-            <button
-              type="button"
-              className="btn btn--icon"
+              className="st__play"
               onClick={() => {
                 held.current = playing;
                 setPlaying((p) => !p);
@@ -374,13 +411,29 @@ export function Story({ onFailed, tour = false }: { onFailed: () => void; tour?:
             >
               <Icon name={playing ? "pause" : "play"} />
             </button>
-            <ol className="st__rail" aria-hidden="true">
-              {BEATS.slice(FIRST).map((b, k) => (
-                <li key={b.id} data-on={k + FIRST === beat ? "" : undefined} data-past={k + FIRST < beat ? "" : undefined} />
-              ))}
-            </ol>
-          </div>
-        </div>
+            {BEATS.map((b, i) =>
+              i < FIRST ? null : (
+                <button
+                  key={b.id}
+                  type="button"
+                  className="st__tab"
+                  aria-current={i === beat ? "step" : undefined}
+                  data-run={i === beat && playing ? "" : undefined}
+                  onClick={() => {
+                    take();
+                    goTo(i);
+                  }}
+                >
+                  <span className="st__tabbar" aria-hidden="true">
+                    <i key={`${beat}-${playing}`} style={{ animationDuration: `${DWELL}ms` }} />
+                  </span>
+                  <span className="st__tabn">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="st__tabl">{b.name}</span>
+                </button>
+              ),
+            )}
+          </nav>
+        ) : null}
       </div>
     </section>
   );

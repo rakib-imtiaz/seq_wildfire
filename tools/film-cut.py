@@ -23,6 +23,8 @@ K2 = os.path.join(INC, "2k")
 PHONE = os.path.join(INC, "sequoia-phone-heroes-stitched.mp4")
 OUT = os.path.join(ROOT, "public", "media", "video")
 S0 = 2 / 48  # each 2K clip's first frame can be a stray frame or a hard white flash
+# generated stills (10-30): while these exist, tools/stills.py owns the hero and careers stills
+GEN = os.path.join(INC, "gen")
 
 
 def scene(n):
@@ -70,13 +72,16 @@ def frame(src, t):
     return img
 
 
-def poster(src, t, dst, width, crop=None):
+def poster(src, t, dst, width, crop=None, q=80, sharpen=0.0):
     img = frame(src, t)
     if crop:
         h, w = img.shape[:2]
         img = img[int(crop[1] * h):int(crop[3] * h), int(crop[0] * w):int(crop[2] * w)]
     h, w = img.shape[:2]
-    cv2.imwrite(dst, cv2.resize(img, (width, round(h * width / w)), interpolation=cv2.INTER_AREA), [cv2.IMWRITE_WEBP_QUALITY, 80])
+    img = cv2.resize(img, (width, round(h * width / w)), interpolation=cv2.INTER_AREA)
+    if sharpen:
+        img = cv2.addWeighted(img, 1 + sharpen, cv2.GaussianBlur(img, (0, 0), 1.2), -sharpen, 0)
+    cv2.imwrite(dst, img, [cv2.IMWRITE_WEBP_QUALITY, q])
 
 
 def film():
@@ -128,8 +133,16 @@ def desk_hero(width=1920, sfx=""):
     dst = os.path.join(OUT, f"d-hero{sfx}.mp4")
     run([*ins, "-filter_complex", graph, "-map", "[v]", "-an", "-c:v", "libx264", "-preset", "slow", "-crf", crf, "-maxrate", f"{rate}k",
          "-bufsize", f"{2 * rate}k", "-profile:v", "high", "-pix_fmt", "yuv420p", "-movflags", "+faststart", dst])
-    poster(DESK[0][0], 7.5, os.path.join(OUT, f"d-hero{sfx}.webp"), width)
+    # the hero's still (10-30, the user: "should be something sharp"): 01 at 7.52 s, the sharpest, stillest frame of
+    # the three shots by a frame scan, at a higher quality with a light sharpen; it stays over the loop until it plays
+    hero_still(width, sfx)
     return [dst]
+
+
+def hero_still(width, sfx=""):
+    if os.path.exists(os.path.join(GEN, "hero-still.png")):
+        return
+    poster(DESK[0][0], 7.52, os.path.join(OUT, f"d-hero{sfx}.webp"), width, q=90, sharpen=0.35)
 
 
 # Phones (the user's second comp, 10-27): tall cards over footage. The hero is native 9:16: the patrol (stitch clip 1,
@@ -199,6 +212,8 @@ def cards(width=1280, sfx="", ids=None):
         poster(scene(n), a if boom else a + 0.2, os.path.join(OUT, f"c-{cid}{sfx}.webp"), width)
         out.append(dst)
     for sid, n, t, crop, w in {"": STILLS, "-hd": STILLS_HD}.get(sfx, []):
+        if os.path.exists(os.path.join(GEN, "careers-still.png")):
+            break
         dst = os.path.join(OUT, f"st-{sid}{sfx}.webp")
         poster(scene(n), t, dst, w, crop)
         out.append(dst)
@@ -219,6 +234,10 @@ if __name__ == "__main__":
         made += hero() + cards()
     if not only or "hd" in only:
         made += cards(1920, "-hd")
+    if "stills" in only:
+        hero_still(1920)
+        hero_still(2560, "-2k")
+        made += [os.path.join(OUT, "d-hero.webp"), os.path.join(OUT, "d-hero-2k.webp")]
     if not only or "2k" in only:
         made += desk_hero(2560, "-2k") + cards(2560, "-2k", FULL)
     for x in made:

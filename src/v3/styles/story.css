@@ -336,9 +336,61 @@
 /* ---------------------------------------------------------------- the tour (10-30)
    The same stage on the desktop card page (sections/Model), one screen tall and not pinned; the headings take the card
    page's type (Barlow, title case) instead of condensed caps. */
-.mmodel { min-height: clamp(600px, calc(100svh - var(--hdr)), 56.25vw); background: var(--ground); }
+.mmodel { min-height: clamp(640px, calc(100svh - var(--hdr)), 1200px); background: var(--ground); }
 .st--tour { height: auto; padding-top: 0; background: var(--ground); }
-.st--tour .st__stage { position: relative; top: auto; height: clamp(600px, calc(100svh - var(--hdr)), 56.25vw); }
+/* the whole screen under the header: the copy column needs the height (the user's shot: a 16:9 cap squeezed it) */
+.st--tour .st__stage { position: relative; top: auto; height: clamp(640px, calc(100svh - var(--hdr)), 1200px); }
 .st--tour .st__view { transition: opacity 500ms var(--ease-out); }
 .st--tour .st__view[data-fade] { opacity: 0; }
-.st--tour .beat__h2 { font-family: var(--f-d); font-weight: 400; font-size: clamp(40px, 3.6vw, 72px); line-height: 1.04; letter-spacing: -0.015em; text-transform: capitalize; }
+.st--tour .st__stage { grid-template-rows: minmax(0, 1fr) auto; grid-template-areas: "copy view" "tabs tabs"; }
+.st--tour .beat { transition: opacity 600ms var(--ease-out), transform 700ms var(--ease-out); }
+.st--tour .beat__h2 { font-family: var(--f-d); font-weight: 400; font-size: clamp(40px, 3.6vw, 72px); line-height: 1.06; letter-spacing: -0.015em; text-transform: capitalize; }
+
+/* the chapter tabs: the manual switch, with the running chapter's time as a cobalt line */
+.st__tabs { grid-area: tabs; display: grid; grid-template-columns: auto repeat(6, minmax(0, 1fr)); border-top: 1px solid var(--line); background: var(--plaster); }
+/* play / pause, its icon on the copy column's edge */
+.st__play {
+  -webkit-tap-highlight-color: transparent;
+  display: grid;
+  place-items: center start;
+  width: calc(var(--pad) + 56px);
+  padding: 0 0 0 var(--pad);
+  border: 0;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  transition: color 200ms ease;
+}
+.st__tab {
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-width: 0;
+  min-height: 76px;
+  padding: 26px clamp(14px, 1.6vw, 28px) 22px;
+  border: 0;
+  border-left: 1px solid var(--line-2);
+  background: none;
+  text-align: left;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 200ms ease, background-color 200ms ease;
+}
+.st__tabn { flex: none; font-family: var(--f-m); font-size: 12px; letter-spacing: 0.08em; }
+.st__tabl { overflow: hidden; font-family: var(--f-d); font-weight: 500; font-size: clamp(14px, 1vw, 17px); white-space: nowrap; text-overflow: ellipsis; }
+.st__tab[aria-current] { color: var(--ink); background: var(--ground); }
+.st__tab[aria-current] .st__tabn { color: var(--cobalt); }
+.st__tabbar { position: absolute; left: 0; right: 0; top: -1px; height: 2px; overflow: hidden; }
+.st__tabbar i { display: block; height: 100%; background: var(--cobalt); transform: scaleX(0); transform-origin: left; }
+.st__tab[aria-current] .st__tabbar i { transform: none; }
+html[data-motion="on"] .st__tab[data-run] .st__tabbar i { animation: st-fill linear both; }
+@keyframes st-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (hover: hover) and (pointer: fine) {
+  .st__tab:not([aria-current]):hover { color: var(--ink); background: rgba(26, 28, 30, 0.04); }
+  .st__play:hover { color: var(--cobalt); }
+}
+@media (max-width: 1199px) {
+  .st__tab { flex-direction: column; gap: 4px; padding-top: 18px; padding-bottom: 16px; }
+}
